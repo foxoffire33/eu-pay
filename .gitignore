@@ -27,7 +27,6 @@ android/.cxx/
 # ── Backend (PHP / Symfony) ──
 backend/vendor/
 backend/var/
-backend/bin/
 backend/composer.lock
 backend/.env.local
 backend/.env.*.local
