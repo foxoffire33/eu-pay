@@ -118,11 +118,17 @@ patches:
         path: /spec/template/spec/containers/0/resources/limits/memory
         value: 256Mi
 
-configMapGenerator:
-  - name: eupay-config
-    behavior: merge
-    literals:
-      - APP_ENV=staging
-      - APP_DEBUG=1
-      - PSD2_API_BASE_URL=https://api-sandbox.rabobank.nl
-      - CORS_ALLOW_ORIGIN=^https://staging-app\.eupay\.eu$
+  # ── Staging ConfigMap overrides ──
+  - target:
+      kind: ConfigMap
+      name: eupay-config
+    patch: |
+      apiVersion: v1
+      kind: ConfigMap
+      metadata:
+        name: eupay-config
+      data:
+        APP_ENV: "staging"
+        APP_DEBUG: "1"
+        PSD2_API_BASE_URL: "https://api-sandbox.rabobank.nl"
+        CORS_ALLOW_ORIGIN: "^https://staging-app\\.eupay\\.eu$"

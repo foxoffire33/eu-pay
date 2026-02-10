@@ -1,1 +1,0 @@
--keep,allowobfuscation,allowshrinking class nl.delaparra_services.apps.eupay.ui.viewmodel.CardsViewModel

@@ -15,7 +15,7 @@ spec:
 
   # Only allow resources from the eu-pay repo
   sourceRepos:
-    - https://github.com/user/eu-pay.git
+    - https://github.com/foxoffire33/eu-pay.git
 
   # Allowed Kubernetes resource types
   clusterResourceWhitelist:

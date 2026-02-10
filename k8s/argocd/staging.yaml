@@ -12,8 +12,8 @@ spec:
   project: eupay
 
   source:
-    repoURL: https://github.com/user/eu-pay.git
-    targetRevision: develop
+    repoURL: https://github.com/foxoffire33/eu-pay.git
+    targetRevision: main
     path: k8s/overlays/staging
 
   destination:

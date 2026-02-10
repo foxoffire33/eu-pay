@@ -141,11 +141,17 @@ patches:
         path: /spec/minAvailable
         value: 2
 
-configMapGenerator:
-  - name: eupay-config
-    behavior: merge
-    literals:
-      - APP_ENV=prod
-      - APP_DEBUG=0
-      - PSD2_API_BASE_URL=https://api.rabobank.nl
-      - CORS_ALLOW_ORIGIN=^https://app\.eupay\.eu$
+  # ── Production ConfigMap overrides ──
+  - target:
+      kind: ConfigMap
+      name: eupay-config
+    patch: |
+      apiVersion: v1
+      kind: ConfigMap
+      metadata:
+        name: eupay-config
+      data:
+        APP_ENV: "prod"
+        APP_DEBUG: "0"
+        PSD2_API_BASE_URL: "https://api.rabobank.nl"
+        CORS_ALLOW_ORIGIN: "^https://app\\.eupay\\.eu$"

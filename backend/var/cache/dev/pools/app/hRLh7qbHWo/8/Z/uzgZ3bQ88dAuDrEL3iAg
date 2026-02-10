@@ -1,3 +1,0 @@
-1770757149
-reg_67a4e925992838e9b15599edbd7506707922370c661307a924088e16ddc421cf
-a:2:{s:7:"options";s:517:"{"challenge":"R0ZRbWVSUHd4R21fWExtX2I5U1VTaHJ4c09VWGdTT2tLa1dmTzhkUVE3TQ","timeout":60000,"rp":{"id":"eupay.localhost","name":"EU Pay"},"user":{"id":"MWYxMDZjMzEtMDllZi02NmI2LTg4N2YtZjEyOTU5NjE2ZjVh","name":"Test User","displayName":"Test User"},"pubKeyCredParams":[{"type":"public-key","alg":-7},{"type":"public-key","alg":-257}],"authenticatorSelection":{"requireResidentKey":null,"authenticatorAttachment":null,"userVerification":"preferred","residentKey":"preferred"},"attestation":"none","excludeCredentials":[]}";s:7:"user_id";s:36:"1f106c31-09ef-66b6-887f-f12959616f5a";}
