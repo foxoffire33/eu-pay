@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: eupay-landing
+  namespace: eupay
+  labels:
+    app: eupay-landing
+spec:
+  selector:
+    app: eupay-landing
+  ports:
+    - port: 80
+      targetPort: 80
+      protocol: TCP
+      name: http
+  type: ClusterIP

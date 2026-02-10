@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="nl.delaparra_services.apps.eupay.hce.EmvUtilTest" tests="34" skipped="0" failures="0" errors="0" timestamp="2026-02-10T21:11:05.232Z" hostname="EliteBook-X" time="0.047">
+  <properties/>
+  <testcase name="startsWith returns false for non-matching prefix" classname="nl.delaparra_services.apps.eupay.hce.EmvUtilTest" time="0.014"/>
+  <testcase name="getInstruction returns 0 for short APDU" classname="nl.delaparra_services.apps.eupay.hce.EmvUtilTest" time="0.0"/>
+  <testcase name="hexToBytes converts correctly" classname="nl.delaparra_services.apps.eupay.hce.EmvUtilTest" time="0.0"/>
+  <testcase name="tlv single byte tag short value" classname="nl.delaparra_services.apps.eupay.hce.EmvUtilTest" time="0.0"/>
+  <testcase name="tlv long value uses extended length" classname="nl.delaparra_services.apps.eupay.hce.EmvUtilTest" time="0.0"/>
+  <testcase name="getInstruction extracts INS byte" classname="nl.delaparra_services.apps.eupay.hce.EmvUtilTest" time="0.0"/>
+  <testcase name="buildPpseResponse ends with SW_OK" classname="nl.delaparra_services.apps.eupay.hce.EmvUtilTest" time="0.001"/>
+  <testcase name="SW_NOT_FOUND is 6A82" classname="nl.delaparra_services.apps.eupay.hce.EmvUtilTest" time="0.001"/>
+  <testcase name="tlv two byte tag" classname="nl.delaparra_services.apps.eupay.hce.EmvUtilTest" time="0.0"/>
+  <testcase name="tlv empty value" classname="nl.delaparra_services.apps.eupay.hce.EmvUtilTest" time="0.0"/>
+  <testcase name="buildSelectResponse ends with SW_OK" classname="nl.delaparra_services.apps.eupay.hce.EmvUtilTest" time="0.002"/>
+  <testcase name="hexToBytes and bytesToHex roundtrip" classname="nl.delaparra_services.apps.eupay.hce.EmvUtilTest" time="0.003"/>
+  <testcase name="bytesToHex converts correctly" classname="nl.delaparra_services.apps.eupay.hce.EmvUtilTest" time="0.001"/>
+  <testcase name="generateCryptogram differs with different amount" classname="nl.delaparra_services.apps.eupay.hce.EmvUtilTest" time="0.017"/>
+  <testcase name="buildRecordResponse ends with SW_OK and contains PAN" classname="nl.delaparra_services.apps.eupay.hce.EmvUtilTest" time="0.002"/>
+  <testcase name="generateCryptogram is deterministic for same inputs" classname="nl.delaparra_services.apps.eupay.hce.EmvUtilTest" time="0.0"/>
+  <testcase name="getApduData returns empty for header-only APDU" classname="nl.delaparra_services.apps.eupay.hce.EmvUtilTest" time="0.0"/>
+  <testcase name="Mastercard AID matches spec" classname="nl.delaparra_services.apps.eupay.hce.EmvUtilTest" time="0.001"/>
+  <testcase name="generateCryptogram differs with different session key" classname="nl.delaparra_services.apps.eupay.hce.EmvUtilTest" time="0.0"/>
+  <testcase name="hexToBytes handles spaces" classname="nl.delaparra_services.apps.eupay.hce.EmvUtilTest" time="0.001"/>
+  <testcase name="generateCryptogram differs with different ATC" classname="nl.delaparra_services.apps.eupay.hce.EmvUtilTest" time="0.001"/>
+  <testcase name="generateCryptogram returns 8 bytes" classname="nl.delaparra_services.apps.eupay.hce.EmvUtilTest" time="0.0"/>
+  <testcase name="hexToBytes empty string returns empty array" classname="nl.delaparra_services.apps.eupay.hce.EmvUtilTest" time="0.0"/>
+  <testcase name="getApduData extracts data field" classname="nl.delaparra_services.apps.eupay.hce.EmvUtilTest" time="0.0"/>
+  <testcase name="startsWith returns false when data shorter than prefix" classname="nl.delaparra_services.apps.eupay.hce.EmvUtilTest" time="0.0"/>
+  <testcase name="buildPpseResponse contains AID" classname="nl.delaparra_services.apps.eupay.hce.EmvUtilTest" time="0.001"/>
+  <testcase name="buildGenerateAcResponse ends with SW_OK" classname="nl.delaparra_services.apps.eupay.hce.EmvUtilTest" time="0.0"/>
+  <testcase name="PPSE AID matches spec" classname="nl.delaparra_services.apps.eupay.hce.EmvUtilTest" time="0.0"/>
+  <testcase name="startsWith returns true for matching prefix" classname="nl.delaparra_services.apps.eupay.hce.EmvUtilTest" time="0.0"/>
+  <testcase name="buildGpoResponse ends with SW_OK" classname="nl.delaparra_services.apps.eupay.hce.EmvUtilTest" time="0.0"/>
+  <testcase name="concat combines byte arrays" classname="nl.delaparra_services.apps.eupay.hce.EmvUtilTest" time="0.0"/>
+  <testcase name="concat single array returns copy" classname="nl.delaparra_services.apps.eupay.hce.EmvUtilTest" time="0.001"/>
+  <testcase name="Visa AID matches spec" classname="nl.delaparra_services.apps.eupay.hce.EmvUtilTest" time="0.0"/>
+  <testcase name="SW_OK is 9000" classname="nl.delaparra_services.apps.eupay.hce.EmvUtilTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

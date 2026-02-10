@@ -1,0 +1,333 @@
+1<?xml version="1.0" encoding="utf-8"?>
+2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+3    package="nl.delaparra_services.apps.eupay.debug"
+4    android:versionCode="1"
+5    android:versionName="0.0.1-debug" >
+6
+7    <uses-sdk
+8        android:minSdkVersion="26"
+9        android:targetSdkVersion="35" />
+10
+11    <!-- NFC hardware -->
+12    <uses-permission android:name="android.permission.NFC" />
+12-->/home/reinier/IdeaProjects/eu-pay/android/app/src/main/AndroidManifest.xml:6:5-62
+12-->/home/reinier/IdeaProjects/eu-pay/android/app/src/main/AndroidManifest.xml:6:22-59
+13    <uses-permission android:name="android.permission.INTERNET" />
+13-->/home/reinier/IdeaProjects/eu-pay/android/app/src/main/AndroidManifest.xml:7:5-67
+13-->/home/reinier/IdeaProjects/eu-pay/android/app/src/main/AndroidManifest.xml:7:22-64
+14    <uses-permission android:name="android.permission.USE_BIOMETRIC" />
+14-->/home/reinier/IdeaProjects/eu-pay/android/app/src/main/AndroidManifest.xml:8:5-72
+14-->/home/reinier/IdeaProjects/eu-pay/android/app/src/main/AndroidManifest.xml:8:22-69
+15    <uses-permission android:name="android.permission.VIBRATE" />
+15-->/home/reinier/IdeaProjects/eu-pay/android/app/src/main/AndroidManifest.xml:9:5-66
+15-->/home/reinier/IdeaProjects/eu-pay/android/app/src/main/AndroidManifest.xml:9:22-63
+16
+17    <uses-feature
+17-->/home/reinier/IdeaProjects/eu-pay/android/app/src/main/AndroidManifest.xml:26:5-28:35
+18        android:name="android.hardware.nfc"
+18-->/home/reinier/IdeaProjects/eu-pay/android/app/src/main/AndroidManifest.xml:27:9-44
+19        android:required="true" />
+19-->/home/reinier/IdeaProjects/eu-pay/android/app/src/main/AndroidManifest.xml:28:9-32
+20    <uses-feature
+20-->/home/reinier/IdeaProjects/eu-pay/android/app/src/main/AndroidManifest.xml:29:5-31:35
+21        android:name="android.hardware.nfc.hce"
+21-->/home/reinier/IdeaProjects/eu-pay/android/app/src/main/AndroidManifest.xml:30:9-48
+22        android:required="true" />
+22-->/home/reinier/IdeaProjects/eu-pay/android/app/src/main/AndroidManifest.xml:31:9-32
+23    <!-- suppress DeprecatedClassUsageInspection -->
+24    <uses-permission android:name="android.permission.USE_FINGERPRINT" />
+24-->[androidx.biometric:biometric:1.2.0-alpha05] /home/reinier/.gradle/caches/8.13/transforms/fd758c287a286df4d4491505f0c84ad7/transformed/biometric-1.2.0-alpha05/AndroidManifest.xml:25:5-74
+24-->[androidx.biometric:biometric:1.2.0-alpha05] /home/reinier/.gradle/caches/8.13/transforms/fd758c287a286df4d4491505f0c84ad7/transformed/biometric-1.2.0-alpha05/AndroidManifest.xml:25:22-71
+25
+26    <permission
+26-->[androidx.core:core:1.16.0] /home/reinier/.gradle/caches/8.13/transforms/8880c0dd6035c51b58d72316117fa882/transformed/core-1.16.0/AndroidManifest.xml:22:5-24:47
+27        android:name="nl.delaparra_services.apps.eupay.debug.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+27-->[androidx.core:core:1.16.0] /home/reinier/.gradle/caches/8.13/transforms/8880c0dd6035c51b58d72316117fa882/transformed/core-1.16.0/AndroidManifest.xml:23:9-81
+28        android:protectionLevel="signature" />
+28-->[androidx.core:core:1.16.0] /home/reinier/.gradle/caches/8.13/transforms/8880c0dd6035c51b58d72316117fa882/transformed/core-1.16.0/AndroidManifest.xml:24:9-44
+29
+30    <uses-permission android:name="nl.delaparra_services.apps.eupay.debug.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
+30-->[androidx.core:core:1.16.0] /home/reinier/.gradle/caches/8.13/transforms/8880c0dd6035c51b58d72316117fa882/transformed/core-1.16.0/AndroidManifest.xml:26:5-97
+30-->[androidx.core:core:1.16.0] /home/reinier/.gradle/caches/8.13/transforms/8880c0dd6035c51b58d72316117fa882/transformed/core-1.16.0/AndroidManifest.xml:26:22-94
+31
+32    <application
+32-->/home/reinier/IdeaProjects/eu-pay/android/app/src/main/AndroidManifest.xml:37:5-93:19
+33        android:name="nl.delaparra_services.apps.eupay.EuPayApp"
+33-->/home/reinier/IdeaProjects/eu-pay/android/app/src/main/AndroidManifest.xml:38:9-33
+34        android:allowBackup="false"
+34-->/home/reinier/IdeaProjects/eu-pay/android/app/src/main/AndroidManifest.xml:39:9-36
+35        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
+35-->[androidx.core:core:1.16.0] /home/reinier/.gradle/caches/8.13/transforms/8880c0dd6035c51b58d72316117fa882/transformed/core-1.16.0/AndroidManifest.xml:28:18-86
+36        android:dataExtractionRules="@xml/data_extraction_rules"
+36-->/home/reinier/IdeaProjects/eu-pay/android/app/src/main/AndroidManifest.xml:41:9-65
+37        android:debuggable="true"
+38        android:extractNativeLibs="false"
+39        android:fullBackupContent="false"
+39-->/home/reinier/IdeaProjects/eu-pay/android/app/src/main/AndroidManifest.xml:40:9-42
+40        android:icon="@mipmap/ic_launcher"
+40-->/home/reinier/IdeaProjects/eu-pay/android/app/src/main/AndroidManifest.xml:42:9-43
+41        android:label="EU Pay"
+41-->/home/reinier/IdeaProjects/eu-pay/android/app/src/main/AndroidManifest.xml:43:9-31
+42        android:networkSecurityConfig="@xml/network_security_config"
+42-->/home/reinier/IdeaProjects/eu-pay/android/app/src/main/AndroidManifest.xml:46:9-69
+43        android:supportsRtl="true"
+43-->/home/reinier/IdeaProjects/eu-pay/android/app/src/main/AndroidManifest.xml:44:9-35
+44        android:theme="@style/Theme.EuPay"
+44-->/home/reinier/IdeaProjects/eu-pay/android/app/src/main/AndroidManifest.xml:45:9-43
+45        android:usesCleartextTraffic="false" >
+45-->/home/reinier/IdeaProjects/eu-pay/android/app/src/main/AndroidManifest.xml:47:9-45
+46
+47        <!--
+48            PRIVACY: Opt out of Google Play advertising ID entirely.
+49            EU Pay does not track users, serve ads, or share data with ad networks.
+50        -->
+51        <meta-data
+51-->/home/reinier/IdeaProjects/eu-pay/android/app/src/main/AndroidManifest.xml:53:9-55:37
+52            android:name="com.google.android.gms.ads.AD_MANAGER_APP"
+52-->/home/reinier/IdeaProjects/eu-pay/android/app/src/main/AndroidManifest.xml:54:13-69
+53            android:value="false" />
+53-->/home/reinier/IdeaProjects/eu-pay/android/app/src/main/AndroidManifest.xml:55:13-34
+54        <meta-data
+54-->/home/reinier/IdeaProjects/eu-pay/android/app/src/main/AndroidManifest.xml:56:9-58:37
+55            android:name="google_analytics_adid_collection_enabled"
+55-->/home/reinier/IdeaProjects/eu-pay/android/app/src/main/AndroidManifest.xml:57:13-68
+56            android:value="false" />
+56-->/home/reinier/IdeaProjects/eu-pay/android/app/src/main/AndroidManifest.xml:58:13-34
+57        <meta-data
+57-->/home/reinier/IdeaProjects/eu-pay/android/app/src/main/AndroidManifest.xml:59:9-61:37
+58            android:name="firebase_analytics_collection_enabled"
+58-->/home/reinier/IdeaProjects/eu-pay/android/app/src/main/AndroidManifest.xml:60:13-65
+59            android:value="false" />
+59-->/home/reinier/IdeaProjects/eu-pay/android/app/src/main/AndroidManifest.xml:61:13-34
+60        <meta-data
+60-->/home/reinier/IdeaProjects/eu-pay/android/app/src/main/AndroidManifest.xml:62:9-64:37
+61            android:name="firebase_crashlytics_collection_enabled"
+61-->/home/reinier/IdeaProjects/eu-pay/android/app/src/main/AndroidManifest.xml:63:13-67
+62            android:value="false" />
+62-->/home/reinier/IdeaProjects/eu-pay/android/app/src/main/AndroidManifest.xml:64:13-34
+63
+64        <activity
+64-->/home/reinier/IdeaProjects/eu-pay/android/app/src/main/AndroidManifest.xml:66:9-74:20
+65            android:name="nl.delaparra_services.apps.eupay.ui.MainActivity"
+65-->/home/reinier/IdeaProjects/eu-pay/android/app/src/main/AndroidManifest.xml:67:13-44
+66            android:exported="true"
+66-->/home/reinier/IdeaProjects/eu-pay/android/app/src/main/AndroidManifest.xml:68:13-36
+67            android:launchMode="singleTop" >
+67-->/home/reinier/IdeaProjects/eu-pay/android/app/src/main/AndroidManifest.xml:69:13-43
+68            <intent-filter>
+68-->/home/reinier/IdeaProjects/eu-pay/android/app/src/main/AndroidManifest.xml:70:13-73:29
+69                <action android:name="android.intent.action.MAIN" />
+69-->/home/reinier/IdeaProjects/eu-pay/android/app/src/main/AndroidManifest.xml:71:17-69
+69-->/home/reinier/IdeaProjects/eu-pay/android/app/src/main/AndroidManifest.xml:71:25-66
+70
+71                <category android:name="android.intent.category.LAUNCHER" />
+71-->/home/reinier/IdeaProjects/eu-pay/android/app/src/main/AndroidManifest.xml:72:17-77
+71-->/home/reinier/IdeaProjects/eu-pay/android/app/src/main/AndroidManifest.xml:72:27-74
+72            </intent-filter>
+73        </activity>
+74
+75        <!--
+76            Host Card Emulation Service.
+77            This is the core of the tap-to-pay functionality.
+78            It responds to NFC APDU commands from POS terminals.
+79        -->
+80        <service
+80-->/home/reinier/IdeaProjects/eu-pay/android/app/src/main/AndroidManifest.xml:81:9-91:19
+81            android:name="nl.delaparra_services.apps.eupay.hce.PaymentHceService"
+81-->/home/reinier/IdeaProjects/eu-pay/android/app/src/main/AndroidManifest.xml:82:13-50
+82            android:exported="true"
+82-->/home/reinier/IdeaProjects/eu-pay/android/app/src/main/AndroidManifest.xml:83:13-36
+83            android:permission="android.permission.BIND_NFC_SERVICE" >
+83-->/home/reinier/IdeaProjects/eu-pay/android/app/src/main/AndroidManifest.xml:84:13-69
+84            <intent-filter>
+84-->/home/reinier/IdeaProjects/eu-pay/android/app/src/main/AndroidManifest.xml:85:13-87:29
+85                <action android:name="android.nfc.cardemulation.action.HOST_APDU_SERVICE" />
+85-->/home/reinier/IdeaProjects/eu-pay/android/app/src/main/AndroidManifest.xml:86:17-93
+85-->/home/reinier/IdeaProjects/eu-pay/android/app/src/main/AndroidManifest.xml:86:25-90
+86            </intent-filter>
+87
+88            <meta-data
+88-->/home/reinier/IdeaProjects/eu-pay/android/app/src/main/AndroidManifest.xml:88:13-90:59
+89                android:name="android.nfc.cardemulation.host_apdu_service"
+89-->/home/reinier/IdeaProjects/eu-pay/android/app/src/main/AndroidManifest.xml:89:17-75
+90                android:resource="@xml/hce_payment_aid" />
+90-->/home/reinier/IdeaProjects/eu-pay/android/app/src/main/AndroidManifest.xml:90:17-56
+91        </service>
+92
+93        <activity
+93-->[androidx.compose.ui:ui-test-manifest:1.10.2] /home/reinier/.gradle/caches/8.13/transforms/19e7bd566a3a63f606dd57cf0d250805/transformed/ui-test-manifest-1.10.2/AndroidManifest.xml:23:9-26:79
+94            android:name="androidx.activity.ComponentActivity"
+94-->[androidx.compose.ui:ui-test-manifest:1.10.2] /home/reinier/.gradle/caches/8.13/transforms/19e7bd566a3a63f606dd57cf0d250805/transformed/ui-test-manifest-1.10.2/AndroidManifest.xml:24:13-63
+95            android:exported="true"
+95-->[androidx.compose.ui:ui-test-manifest:1.10.2] /home/reinier/.gradle/caches/8.13/transforms/19e7bd566a3a63f606dd57cf0d250805/transformed/ui-test-manifest-1.10.2/AndroidManifest.xml:25:13-36
+96            android:theme="@android:style/Theme.Material.Light.NoActionBar" />
+96-->[androidx.compose.ui:ui-test-manifest:1.10.2] /home/reinier/.gradle/caches/8.13/transforms/19e7bd566a3a63f606dd57cf0d250805/transformed/ui-test-manifest-1.10.2/AndroidManifest.xml:26:13-76
+97
+98        <service
+98-->[androidx.credentials:credentials-play-services-auth:1.5.0] /home/reinier/.gradle/caches/8.13/transforms/48384c98d62cad3f329b01ee90531409/transformed/credentials-play-services-auth-1.5.0/AndroidManifest.xml:24:9-32:19
+99            android:name="androidx.credentials.playservices.CredentialProviderMetadataHolder"
+99-->[androidx.credentials:credentials-play-services-auth:1.5.0] /home/reinier/.gradle/caches/8.13/transforms/48384c98d62cad3f329b01ee90531409/transformed/credentials-play-services-auth-1.5.0/AndroidManifest.xml:25:13-94
+100            android:enabled="true"
+100-->[androidx.credentials:credentials-play-services-auth:1.5.0] /home/reinier/.gradle/caches/8.13/transforms/48384c98d62cad3f329b01ee90531409/transformed/credentials-play-services-auth-1.5.0/AndroidManifest.xml:26:13-35
+101            android:exported="false" >
+101-->[androidx.credentials:credentials-play-services-auth:1.5.0] /home/reinier/.gradle/caches/8.13/transforms/48384c98d62cad3f329b01ee90531409/transformed/credentials-play-services-auth-1.5.0/AndroidManifest.xml:27:13-37
+102            <meta-data
+102-->[androidx.credentials:credentials-play-services-auth:1.5.0] /home/reinier/.gradle/caches/8.13/transforms/48384c98d62cad3f329b01ee90531409/transformed/credentials-play-services-auth-1.5.0/AndroidManifest.xml:29:13-31:104
+103                android:name="androidx.credentials.CREDENTIAL_PROVIDER_KEY"
+103-->[androidx.credentials:credentials-play-services-auth:1.5.0] /home/reinier/.gradle/caches/8.13/transforms/48384c98d62cad3f329b01ee90531409/transformed/credentials-play-services-auth-1.5.0/AndroidManifest.xml:30:17-76
+104                android:value="androidx.credentials.playservices.CredentialProviderPlayServicesImpl" />
+104-->[androidx.credentials:credentials-play-services-auth:1.5.0] /home/reinier/.gradle/caches/8.13/transforms/48384c98d62cad3f329b01ee90531409/transformed/credentials-play-services-auth-1.5.0/AndroidManifest.xml:31:17-101
+105        </service>
+106
+107        <activity
+107-->[androidx.credentials:credentials-play-services-auth:1.5.0] /home/reinier/.gradle/caches/8.13/transforms/48384c98d62cad3f329b01ee90531409/transformed/credentials-play-services-auth-1.5.0/AndroidManifest.xml:34:9-41:20
+108            android:name="androidx.credentials.playservices.HiddenActivity"
+108-->[androidx.credentials:credentials-play-services-auth:1.5.0] /home/reinier/.gradle/caches/8.13/transforms/48384c98d62cad3f329b01ee90531409/transformed/credentials-play-services-auth-1.5.0/AndroidManifest.xml:35:13-76
+109            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden"
+109-->[androidx.credentials:credentials-play-services-auth:1.5.0] /home/reinier/.gradle/caches/8.13/transforms/48384c98d62cad3f329b01ee90531409/transformed/credentials-play-services-auth-1.5.0/AndroidManifest.xml:36:13-87
+110            android:enabled="true"
+110-->[androidx.credentials:credentials-play-services-auth:1.5.0] /home/reinier/.gradle/caches/8.13/transforms/48384c98d62cad3f329b01ee90531409/transformed/credentials-play-services-auth-1.5.0/AndroidManifest.xml:37:13-35
+111            android:exported="false"
+111-->[androidx.credentials:credentials-play-services-auth:1.5.0] /home/reinier/.gradle/caches/8.13/transforms/48384c98d62cad3f329b01ee90531409/transformed/credentials-play-services-auth-1.5.0/AndroidManifest.xml:38:13-37
+112            android:fitsSystemWindows="true"
+112-->[androidx.credentials:credentials-play-services-auth:1.5.0] /home/reinier/.gradle/caches/8.13/transforms/48384c98d62cad3f329b01ee90531409/transformed/credentials-play-services-auth-1.5.0/AndroidManifest.xml:39:13-45
+113            android:theme="@style/Theme.Hidden" >
+113-->[androidx.credentials:credentials-play-services-auth:1.5.0] /home/reinier/.gradle/caches/8.13/transforms/48384c98d62cad3f329b01ee90531409/transformed/credentials-play-services-auth-1.5.0/AndroidManifest.xml:40:13-48
+114        </activity>
+115        <activity
+115-->[androidx.credentials:credentials-play-services-auth:1.5.0] /home/reinier/.gradle/caches/8.13/transforms/48384c98d62cad3f329b01ee90531409/transformed/credentials-play-services-auth-1.5.0/AndroidManifest.xml:42:9-49:20
+116            android:name="androidx.credentials.playservices.IdentityCredentialApiHiddenActivity"
+116-->[androidx.credentials:credentials-play-services-auth:1.5.0] /home/reinier/.gradle/caches/8.13/transforms/48384c98d62cad3f329b01ee90531409/transformed/credentials-play-services-auth-1.5.0/AndroidManifest.xml:43:13-97
+117            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden"
+117-->[androidx.credentials:credentials-play-services-auth:1.5.0] /home/reinier/.gradle/caches/8.13/transforms/48384c98d62cad3f329b01ee90531409/transformed/credentials-play-services-auth-1.5.0/AndroidManifest.xml:44:13-87
+118            android:enabled="true"
+118-->[androidx.credentials:credentials-play-services-auth:1.5.0] /home/reinier/.gradle/caches/8.13/transforms/48384c98d62cad3f329b01ee90531409/transformed/credentials-play-services-auth-1.5.0/AndroidManifest.xml:45:13-35
+119            android:exported="false"
+119-->[androidx.credentials:credentials-play-services-auth:1.5.0] /home/reinier/.gradle/caches/8.13/transforms/48384c98d62cad3f329b01ee90531409/transformed/credentials-play-services-auth-1.5.0/AndroidManifest.xml:46:13-37
+120            android:fitsSystemWindows="true"
+120-->[androidx.credentials:credentials-play-services-auth:1.5.0] /home/reinier/.gradle/caches/8.13/transforms/48384c98d62cad3f329b01ee90531409/transformed/credentials-play-services-auth-1.5.0/AndroidManifest.xml:47:13-45
+121            android:theme="@style/Theme.Hidden" >
+121-->[androidx.credentials:credentials-play-services-auth:1.5.0] /home/reinier/.gradle/caches/8.13/transforms/48384c98d62cad3f329b01ee90531409/transformed/credentials-play-services-auth-1.5.0/AndroidManifest.xml:48:13-48
+122        </activity>
+123        <activity
+123-->[com.google.android.gms:play-services-auth:21.1.1] /home/reinier/.gradle/caches/8.13/transforms/d5a28aa2b3faf4dd80606dab23106458/transformed/play-services-auth-21.1.1/AndroidManifest.xml:23:9-27:75
+124            android:name="com.google.android.gms.auth.api.signin.internal.SignInHubActivity"
+124-->[com.google.android.gms:play-services-auth:21.1.1] /home/reinier/.gradle/caches/8.13/transforms/d5a28aa2b3faf4dd80606dab23106458/transformed/play-services-auth-21.1.1/AndroidManifest.xml:24:13-93
+125            android:excludeFromRecents="true"
+125-->[com.google.android.gms:play-services-auth:21.1.1] /home/reinier/.gradle/caches/8.13/transforms/d5a28aa2b3faf4dd80606dab23106458/transformed/play-services-auth-21.1.1/AndroidManifest.xml:25:13-46
+126            android:exported="false"
+126-->[com.google.android.gms:play-services-auth:21.1.1] /home/reinier/.gradle/caches/8.13/transforms/d5a28aa2b3faf4dd80606dab23106458/transformed/play-services-auth-21.1.1/AndroidManifest.xml:26:13-37
+127            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+127-->[com.google.android.gms:play-services-auth:21.1.1] /home/reinier/.gradle/caches/8.13/transforms/d5a28aa2b3faf4dd80606dab23106458/transformed/play-services-auth-21.1.1/AndroidManifest.xml:27:13-72
+128        <!--
+129            Service handling Google Sign-In user revocation. For apps that do not integrate with
+130            Google Sign-In, this service will never be started.
+131        -->
+132        <service
+132-->[com.google.android.gms:play-services-auth:21.1.1] /home/reinier/.gradle/caches/8.13/transforms/d5a28aa2b3faf4dd80606dab23106458/transformed/play-services-auth-21.1.1/AndroidManifest.xml:33:9-37:51
+133            android:name="com.google.android.gms.auth.api.signin.RevocationBoundService"
+133-->[com.google.android.gms:play-services-auth:21.1.1] /home/reinier/.gradle/caches/8.13/transforms/d5a28aa2b3faf4dd80606dab23106458/transformed/play-services-auth-21.1.1/AndroidManifest.xml:34:13-89
+134            android:exported="true"
+134-->[com.google.android.gms:play-services-auth:21.1.1] /home/reinier/.gradle/caches/8.13/transforms/d5a28aa2b3faf4dd80606dab23106458/transformed/play-services-auth-21.1.1/AndroidManifest.xml:35:13-36
+135            android:permission="com.google.android.gms.auth.api.signin.permission.REVOCATION_NOTIFICATION"
+135-->[com.google.android.gms:play-services-auth:21.1.1] /home/reinier/.gradle/caches/8.13/transforms/d5a28aa2b3faf4dd80606dab23106458/transformed/play-services-auth-21.1.1/AndroidManifest.xml:36:13-107
+136            android:visibleToInstantApps="true" />
+136-->[com.google.android.gms:play-services-auth:21.1.1] /home/reinier/.gradle/caches/8.13/transforms/d5a28aa2b3faf4dd80606dab23106458/transformed/play-services-auth-21.1.1/AndroidManifest.xml:37:13-48
+137
+138        <activity
+138-->[com.google.android.gms:play-services-base:18.5.0] /home/reinier/.gradle/caches/8.13/transforms/f08556e9c9892a521771b2d383f59147/transformed/play-services-base-18.5.0/AndroidManifest.xml:5:9-173
+139            android:name="com.google.android.gms.common.api.GoogleApiActivity"
+139-->[com.google.android.gms:play-services-base:18.5.0] /home/reinier/.gradle/caches/8.13/transforms/f08556e9c9892a521771b2d383f59147/transformed/play-services-base-18.5.0/AndroidManifest.xml:5:19-85
+140            android:exported="false"
+140-->[com.google.android.gms:play-services-base:18.5.0] /home/reinier/.gradle/caches/8.13/transforms/f08556e9c9892a521771b2d383f59147/transformed/play-services-base-18.5.0/AndroidManifest.xml:5:146-170
+141            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+141-->[com.google.android.gms:play-services-base:18.5.0] /home/reinier/.gradle/caches/8.13/transforms/f08556e9c9892a521771b2d383f59147/transformed/play-services-base-18.5.0/AndroidManifest.xml:5:86-145
+142
+143        <meta-data
+143-->[com.google.android.gms:play-services-basement:18.4.0] /home/reinier/.gradle/caches/8.13/transforms/09c2a75d6b5e63a87c82fa83b941fd7f/transformed/play-services-basement-18.4.0/AndroidManifest.xml:6:9-122
+144            android:name="com.google.android.gms.version"
+144-->[com.google.android.gms:play-services-basement:18.4.0] /home/reinier/.gradle/caches/8.13/transforms/09c2a75d6b5e63a87c82fa83b941fd7f/transformed/play-services-basement-18.4.0/AndroidManifest.xml:6:20-65
+145            android:value="@integer/google_play_services_version" />
+145-->[com.google.android.gms:play-services-basement:18.4.0] /home/reinier/.gradle/caches/8.13/transforms/09c2a75d6b5e63a87c82fa83b941fd7f/transformed/play-services-basement-18.4.0/AndroidManifest.xml:6:66-119
+146
+147        <provider
+147-->[androidx.emoji2:emoji2:1.4.0] /home/reinier/.gradle/caches/8.13/transforms/41dda8590a197ed92717d076fd11a602/transformed/emoji2-1.4.0/AndroidManifest.xml:24:9-32:20
+148            android:name="androidx.startup.InitializationProvider"
+148-->[androidx.emoji2:emoji2:1.4.0] /home/reinier/.gradle/caches/8.13/transforms/41dda8590a197ed92717d076fd11a602/transformed/emoji2-1.4.0/AndroidManifest.xml:25:13-67
+149            android:authorities="nl.delaparra_services.apps.eupay.debug.androidx-startup"
+149-->[androidx.emoji2:emoji2:1.4.0] /home/reinier/.gradle/caches/8.13/transforms/41dda8590a197ed92717d076fd11a602/transformed/emoji2-1.4.0/AndroidManifest.xml:26:13-68
+150            android:exported="false" >
+150-->[androidx.emoji2:emoji2:1.4.0] /home/reinier/.gradle/caches/8.13/transforms/41dda8590a197ed92717d076fd11a602/transformed/emoji2-1.4.0/AndroidManifest.xml:27:13-37
+151            <meta-data
+151-->[androidx.emoji2:emoji2:1.4.0] /home/reinier/.gradle/caches/8.13/transforms/41dda8590a197ed92717d076fd11a602/transformed/emoji2-1.4.0/AndroidManifest.xml:29:13-31:52
+152                android:name="androidx.emoji2.text.EmojiCompatInitializer"
+152-->[androidx.emoji2:emoji2:1.4.0] /home/reinier/.gradle/caches/8.13/transforms/41dda8590a197ed92717d076fd11a602/transformed/emoji2-1.4.0/AndroidManifest.xml:30:17-75
+153                android:value="androidx.startup" />
+153-->[androidx.emoji2:emoji2:1.4.0] /home/reinier/.gradle/caches/8.13/transforms/41dda8590a197ed92717d076fd11a602/transformed/emoji2-1.4.0/AndroidManifest.xml:31:17-49
+154            <meta-data
+154-->[androidx.lifecycle:lifecycle-process:2.9.4] /home/reinier/.gradle/caches/8.13/transforms/8f2817f0470083565f2a21c47326711f/transformed/lifecycle-process-2.9.4/AndroidManifest.xml:29:13-31:52
+155                android:name="androidx.lifecycle.ProcessLifecycleInitializer"
+155-->[androidx.lifecycle:lifecycle-process:2.9.4] /home/reinier/.gradle/caches/8.13/transforms/8f2817f0470083565f2a21c47326711f/transformed/lifecycle-process-2.9.4/AndroidManifest.xml:30:17-78
+156                android:value="androidx.startup" />
+156-->[androidx.lifecycle:lifecycle-process:2.9.4] /home/reinier/.gradle/caches/8.13/transforms/8f2817f0470083565f2a21c47326711f/transformed/lifecycle-process-2.9.4/AndroidManifest.xml:31:17-49
+157            <meta-data
+157-->[androidx.profileinstaller:profileinstaller:1.4.0] /home/reinier/.gradle/caches/8.13/transforms/28749cfd9de55909a5db95575466ff2c/transformed/profileinstaller-1.4.0/AndroidManifest.xml:29:13-31:52
+158                android:name="androidx.profileinstaller.ProfileInstallerInitializer"
+158-->[androidx.profileinstaller:profileinstaller:1.4.0] /home/reinier/.gradle/caches/8.13/transforms/28749cfd9de55909a5db95575466ff2c/transformed/profileinstaller-1.4.0/AndroidManifest.xml:30:17-85
+159                android:value="androidx.startup" />
+159-->[androidx.profileinstaller:profileinstaller:1.4.0] /home/reinier/.gradle/caches/8.13/transforms/28749cfd9de55909a5db95575466ff2c/transformed/profileinstaller-1.4.0/AndroidManifest.xml:31:17-49
+160        </provider>
+161
+162        <uses-library
+162-->[androidx.window:window:1.5.0] /home/reinier/.gradle/caches/8.13/transforms/384ad54b6dd1d61228e5802474bfcf98/transformed/window-1.5.0/AndroidManifest.xml:23:9-25:40
+163            android:name="androidx.window.extensions"
+163-->[androidx.window:window:1.5.0] /home/reinier/.gradle/caches/8.13/transforms/384ad54b6dd1d61228e5802474bfcf98/transformed/window-1.5.0/AndroidManifest.xml:24:13-54
+164            android:required="false" />
+164-->[androidx.window:window:1.5.0] /home/reinier/.gradle/caches/8.13/transforms/384ad54b6dd1d61228e5802474bfcf98/transformed/window-1.5.0/AndroidManifest.xml:25:13-37
+165        <uses-library
+165-->[androidx.window:window:1.5.0] /home/reinier/.gradle/caches/8.13/transforms/384ad54b6dd1d61228e5802474bfcf98/transformed/window-1.5.0/AndroidManifest.xml:26:9-28:40
+166            android:name="androidx.window.sidecar"
+166-->[androidx.window:window:1.5.0] /home/reinier/.gradle/caches/8.13/transforms/384ad54b6dd1d61228e5802474bfcf98/transformed/window-1.5.0/AndroidManifest.xml:27:13-51
+167            android:required="false" />
+167-->[androidx.window:window:1.5.0] /home/reinier/.gradle/caches/8.13/transforms/384ad54b6dd1d61228e5802474bfcf98/transformed/window-1.5.0/AndroidManifest.xml:28:13-37
+168
+169        <receiver
+169-->[androidx.profileinstaller:profileinstaller:1.4.0] /home/reinier/.gradle/caches/8.13/transforms/28749cfd9de55909a5db95575466ff2c/transformed/profileinstaller-1.4.0/AndroidManifest.xml:34:9-52:20
+170            android:name="androidx.profileinstaller.ProfileInstallReceiver"
+170-->[androidx.profileinstaller:profileinstaller:1.4.0] /home/reinier/.gradle/caches/8.13/transforms/28749cfd9de55909a5db95575466ff2c/transformed/profileinstaller-1.4.0/AndroidManifest.xml:35:13-76
+171            android:directBootAware="false"
+171-->[androidx.profileinstaller:profileinstaller:1.4.0] /home/reinier/.gradle/caches/8.13/transforms/28749cfd9de55909a5db95575466ff2c/transformed/profileinstaller-1.4.0/AndroidManifest.xml:36:13-44
+172            android:enabled="true"
+172-->[androidx.profileinstaller:profileinstaller:1.4.0] /home/reinier/.gradle/caches/8.13/transforms/28749cfd9de55909a5db95575466ff2c/transformed/profileinstaller-1.4.0/AndroidManifest.xml:37:13-35
+173            android:exported="true"
+173-->[androidx.profileinstaller:profileinstaller:1.4.0] /home/reinier/.gradle/caches/8.13/transforms/28749cfd9de55909a5db95575466ff2c/transformed/profileinstaller-1.4.0/AndroidManifest.xml:38:13-36
+174            android:permission="android.permission.DUMP" >
+174-->[androidx.profileinstaller:profileinstaller:1.4.0] /home/reinier/.gradle/caches/8.13/transforms/28749cfd9de55909a5db95575466ff2c/transformed/profileinstaller-1.4.0/AndroidManifest.xml:39:13-57
+175            <intent-filter>
+175-->[androidx.profileinstaller:profileinstaller:1.4.0] /home/reinier/.gradle/caches/8.13/transforms/28749cfd9de55909a5db95575466ff2c/transformed/profileinstaller-1.4.0/AndroidManifest.xml:40:13-42:29
+176                <action android:name="androidx.profileinstaller.action.INSTALL_PROFILE" />
+176-->[androidx.profileinstaller:profileinstaller:1.4.0] /home/reinier/.gradle/caches/8.13/transforms/28749cfd9de55909a5db95575466ff2c/transformed/profileinstaller-1.4.0/AndroidManifest.xml:41:17-91
+176-->[androidx.profileinstaller:profileinstaller:1.4.0] /home/reinier/.gradle/caches/8.13/transforms/28749cfd9de55909a5db95575466ff2c/transformed/profileinstaller-1.4.0/AndroidManifest.xml:41:25-88
+177            </intent-filter>
+178            <intent-filter>
+178-->[androidx.profileinstaller:profileinstaller:1.4.0] /home/reinier/.gradle/caches/8.13/transforms/28749cfd9de55909a5db95575466ff2c/transformed/profileinstaller-1.4.0/AndroidManifest.xml:43:13-45:29
+179                <action android:name="androidx.profileinstaller.action.SKIP_FILE" />
+179-->[androidx.profileinstaller:profileinstaller:1.4.0] /home/reinier/.gradle/caches/8.13/transforms/28749cfd9de55909a5db95575466ff2c/transformed/profileinstaller-1.4.0/AndroidManifest.xml:44:17-85
+179-->[androidx.profileinstaller:profileinstaller:1.4.0] /home/reinier/.gradle/caches/8.13/transforms/28749cfd9de55909a5db95575466ff2c/transformed/profileinstaller-1.4.0/AndroidManifest.xml:44:25-82
+180            </intent-filter>
+181            <intent-filter>
+181-->[androidx.profileinstaller:profileinstaller:1.4.0] /home/reinier/.gradle/caches/8.13/transforms/28749cfd9de55909a5db95575466ff2c/transformed/profileinstaller-1.4.0/AndroidManifest.xml:46:13-48:29
+182                <action android:name="androidx.profileinstaller.action.SAVE_PROFILE" />
+182-->[androidx.profileinstaller:profileinstaller:1.4.0] /home/reinier/.gradle/caches/8.13/transforms/28749cfd9de55909a5db95575466ff2c/transformed/profileinstaller-1.4.0/AndroidManifest.xml:47:17-88
+182-->[androidx.profileinstaller:profileinstaller:1.4.0] /home/reinier/.gradle/caches/8.13/transforms/28749cfd9de55909a5db95575466ff2c/transformed/profileinstaller-1.4.0/AndroidManifest.xml:47:25-85
+183            </intent-filter>
+184            <intent-filter>
+184-->[androidx.profileinstaller:profileinstaller:1.4.0] /home/reinier/.gradle/caches/8.13/transforms/28749cfd9de55909a5db95575466ff2c/transformed/profileinstaller-1.4.0/AndroidManifest.xml:49:13-51:29
+185                <action android:name="androidx.profileinstaller.action.BENCHMARK_OPERATION" />
+185-->[androidx.profileinstaller:profileinstaller:1.4.0] /home/reinier/.gradle/caches/8.13/transforms/28749cfd9de55909a5db95575466ff2c/transformed/profileinstaller-1.4.0/AndroidManifest.xml:50:17-95
+185-->[androidx.profileinstaller:profileinstaller:1.4.0] /home/reinier/.gradle/caches/8.13/transforms/28749cfd9de55909a5db95575466ff2c/transformed/profileinstaller-1.4.0/AndroidManifest.xml:50:25-92
+186            </intent-filter>
+187        </receiver>
+188    </application>
+189
+190</manifest>

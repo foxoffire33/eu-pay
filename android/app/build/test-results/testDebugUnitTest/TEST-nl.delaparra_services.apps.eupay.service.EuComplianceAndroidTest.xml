@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="nl.delaparra_services.apps.eupay.service.EuComplianceAndroidTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2026-02-10T21:11:06.198Z" hostname="EliteBook-X" time="0.004">
+  <properties/>
+  <testcase name="EraseRequest requires explicit confirmation" classname="nl.delaparra_services.apps.eupay.service.EuComplianceAndroidTest" time="0.0"/>
+  <testcase name="ConsentUpdateRequest can toggle individual consents" classname="nl.delaparra_services.apps.eupay.service.EuComplianceAndroidTest" time="0.0"/>
+  <testcase name="ConsentResponse deserializes correctly" classname="nl.delaparra_services.apps.eupay.service.EuComplianceAndroidTest" time="0.0"/>
+  <testcase name="PasskeyRegisterOptionsRequest defaults consent to false" classname="nl.delaparra_services.apps.eupay.service.EuComplianceAndroidTest" time="0.0"/>
+  <testcase name="PasskeyRegisterOptionsRequest includes gdpr_consent field" classname="nl.delaparra_services.apps.eupay.service.EuComplianceAndroidTest" time="0.001"/>
+  <testcase name="registration sends consent to backend" classname="nl.delaparra_services.apps.eupay.service.EuComplianceAndroidTest" time="0.002"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

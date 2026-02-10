@@ -1,0 +1,6 @@
+framework:
+    cache:
+        pools:
+            webauthn.challenge.cache:
+                adapter: cache.adapter.filesystem
+                default_lifetime: 120

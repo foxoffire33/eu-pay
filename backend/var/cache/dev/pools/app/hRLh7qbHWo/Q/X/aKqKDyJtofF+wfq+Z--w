@@ -1,0 +1,3 @@
+1770757962
+reg_5394acb250e9bfc7c272c93d8226fa214ec23d9f8189312a350d1da5076ccc3e
+a:2:{s:7:"options";s:517:"{"challenge":"bnpfNTJaOGVEeEdPN0pIa2ZiemFJaGFXOUdEd1ExTGFPUmJiSU1YcGJyVQ","timeout":60000,"rp":{"id":"eupay.localhost","name":"EU Pay"},"user":{"id":"MWYxMDZjNGYtNTdhYi02MzgyLWFkNTQtOGY4NzE4ODIzNmEy","name":"Test User","displayName":"Test User"},"pubKeyCredParams":[{"type":"public-key","alg":-7},{"type":"public-key","alg":-257}],"authenticatorSelection":{"requireResidentKey":null,"authenticatorAttachment":null,"userVerification":"preferred","residentKey":"preferred"},"attestation":"none","excludeCredentials":[]}";s:7:"user_id";s:36:"1f106c4f-57ab-6382-ad54-8f87188236a2";}

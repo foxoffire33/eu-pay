@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    EU Pay — Network Security Configuration
+
+    PRIVACY:
+    - Cleartext traffic disabled globally (HTTPS only)
+    - Debug-only exception for localhost/emulator
+    - Certificate pinning for production API (HPKP-style)
+    - No third-party network connections — only api.eupay.eu + PSD2
+-->
+<network-security-config>
+
+    <!-- Default: HTTPS only, no cleartext -->
+    <base-config cleartextTrafficPermitted="false">
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
+
+    <!-- Production API — certificate pinning -->
+    <domain-config cleartextTrafficPermitted="false">
+        <domain includeSubdomains="true">api.eupay.eu</domain>
+        <domain includeSubdomains="true">eupay.eu</domain>
+        <pin-set expiration="2027-01-01">
+            <!-- Primary + backup pins (SHA-256 of Subject Public Key Info) -->
+            <!-- Replace with actual pin hashes before production deployment -->
+            <pin digest="SHA-256">AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</pin>
+            <pin digest="SHA-256">BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB=</pin>
+        </pin-set>
+    </domain-config>
+
+    <!-- PSD2 Open Banking API — certificate pinning -->
+    <domain-config cleartextTrafficPermitted="false">
+        <domain includeSubdomains="true">api.rabobank.nl</domain>
+        <domain includeSubdomains="true">api-sandbox.rabobank.nl</domain>
+    </domain-config>
+
+    <!-- Debug ONLY: allow cleartext for emulator/localhost -->
+    <debug-overrides>
+        <trust-anchors>
+            <certificates src="user" />
+            <certificates src="system" />
+        </trust-anchors>
+    </debug-overrides>
+
+    <!-- Marqeta Card Issuing API — Visa card issuing + NFC tokenization -->
+    <domain-config cleartextTrafficPermitted="false">
+        <domain includeSubdomains="true">sandbox-api.marqeta.com</domain>
+        <domain includeSubdomains="true">api.marqeta.com</domain>
+    </domain-config>
+</network-security-config>

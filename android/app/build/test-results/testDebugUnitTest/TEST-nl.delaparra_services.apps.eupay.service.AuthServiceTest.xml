@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="nl.delaparra_services.apps.eupay.service.AuthServiceTest" tests="10" skipped="0" failures="0" errors="0" timestamp="2026-02-10T21:11:05.285Z" hostname="EliteBook-X" time="0.911">
+  <properties/>
+  <testcase name="getRegisterOptions failure returns error" classname="nl.delaparra_services.apps.eupay.service.AuthServiceTest" time="0.843"/>
+  <testcase name="getRegisterOptions success returns options" classname="nl.delaparra_services.apps.eupay.service.AuthServiceTest" time="0.003"/>
+  <testcase name="completeRegistration success saves token" classname="nl.delaparra_services.apps.eupay.service.AuthServiceTest" time="0.012"/>
+  <testcase name="getProfile success saves userId" classname="nl.delaparra_services.apps.eupay.service.AuthServiceTest" time="0.003"/>
+  <testcase name="getLoginOptions success returns options" classname="nl.delaparra_services.apps.eupay.service.AuthServiceTest" time="0.021"/>
+  <testcase name="network exception returns failure" classname="nl.delaparra_services.apps.eupay.service.AuthServiceTest" time="0.004"/>
+  <testcase name="logout clears token repo" classname="nl.delaparra_services.apps.eupay.service.AuthServiceTest" time="0.002"/>
+  <testcase name="isLoggedIn delegates to token repo" classname="nl.delaparra_services.apps.eupay.service.AuthServiceTest" time="0.002"/>
+  <testcase name="completeLogin failure does not save token" classname="nl.delaparra_services.apps.eupay.service.AuthServiceTest" time="0.017"/>
+  <testcase name="completeLogin success saves token" classname="nl.delaparra_services.apps.eupay.service.AuthServiceTest" time="0.003"/>
+  <system-out><![CDATA[Mockito is currently self-attaching to enable the inline-mock-maker. This will no longer work in future releases of the JDK. Please add Mockito as an agent to your build what is described in Mockito's documentation: https://javadoc.io/doc/org.mockito/mockito-core/latest/org/mockito/Mockito.html#0.3
+Mockito is currently self-attaching to enable the inline-mock-maker. This will no longer work in future releases of the JDK. Please add Mockito as an agent to your build what is described in Mockito's documentation: https://javadoc.io/doc/org.mockito/mockito-core/latest/org/mockito/Mockito.html#0.3
+]]></system-out>
+  <system-err><![CDATA[WARNING: A Java agent has been loaded dynamically (/home/reinier/.gradle/caches/modules-2/files-2.1/net.bytebuddy/byte-buddy-agent/1.15.2/323ea2b871e1aef369c0b0f336259f1cd1a6223/byte-buddy-agent-1.15.2.jar)
+WARNING: If a serviceability tool is in use, please run with -XX:+EnableDynamicAgentLoading to hide this warning
+WARNING: If a serviceability tool is not in use, please run with -Djdk.instrument.traceUsage for more information
+WARNING: Dynamic loading of agents will be disallowed by default in a future release
+]]></system-err>
+</testsuite>
