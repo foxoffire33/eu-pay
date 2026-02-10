@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: eupay-nginx
+  namespace: eupay
+  labels:
+    app: eupay-nginx
+spec:
+  selector:
+    app: eupay-nginx
+  ports:
+    - port: 80
+      targetPort: 80
+      protocol: TCP
+      name: http
+  type: ClusterIP

@@ -1,0 +1,60 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: eupay
+  namespace: argocd
+  labels:
+    app.kubernetes.io/name: eupay
+spec:
+  description: EU Pay — NFC payment platform
+
+  # Only allow deployments to the eupay namespace
+  destinations:
+    - namespace: eupay
+      server: https://kubernetes.default.svc
+
+  # Only allow resources from the eu-pay repo
+  sourceRepos:
+    - https://github.com/user/eu-pay.git
+
+  # Allowed Kubernetes resource types
+  clusterResourceWhitelist:
+    - group: cert-manager.io
+      kind: ClusterIssuer
+    - group: ""
+      kind: Namespace
+
+  namespaceResourceWhitelist:
+    - group: ""
+      kind: "*"
+    - group: apps
+      kind: "*"
+    - group: autoscaling
+      kind: "*"
+    - group: networking.k8s.io
+      kind: "*"
+    - group: policy
+      kind: "*"
+    - group: cert-manager.io
+      kind: Certificate
+
+  # Role bindings for team access
+  roles:
+    - name: developer
+      description: Read-only access + sync staging
+      policies:
+        - p, proj:eupay:developer, applications, get, eupay/*, allow
+        - p, proj:eupay:developer, applications, sync, eupay/eupay-staging, allow
+      groups:
+        - eupay-developers
+
+    - name: admin
+      description: Full access including production sync
+      policies:
+        - p, proj:eupay:admin, applications, *, eupay/*, allow
+      groups:
+        - eupay-admins
+
+  # Prevent accidental deletion of production
+  orphanedResources:
+    warn: true

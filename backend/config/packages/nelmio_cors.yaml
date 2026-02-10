@@ -1,0 +1,16 @@
+nelmio_cors:
+    defaults:
+        origin_regex: true
+        allow_origin: ['%env(CORS_ALLOW_ORIGIN)%']
+        allow_methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS']
+        allow_headers: ['Content-Type', 'Authorization', 'X-Device-Fingerprint']
+        expose_headers: ['Link', 'X-RateLimit-Remaining']
+        max_age: 3600
+    paths:
+        '^/api/':
+            allow_origin: ['*']
+            allow_headers: ['Content-Type', 'Authorization', 'X-Device-Fingerprint']
+            allow_methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE']
+        '^/webhook/':
+            allow_origin: ['https://api-sandbox.rabobank.nl', 'https://api.rabobank.nl']
+            allow_methods: ['POST']

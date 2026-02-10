@@ -1,0 +1,39 @@
+framework:
+    secret: '%env(APP_SECRET)%'
+    http_method_override: false
+    handle_all_throwables: true
+
+    router:
+        utf8: true
+        strict_requirements: ~
+
+    php_errors:
+        log: true
+
+    session:
+        enabled: false  # API-only, no sessions
+
+    serializer:
+        enabled: true
+
+    validation:
+        enabled: true
+        enable_attributes: true
+
+    uid:
+        default_uuid_version: 6
+        time_based_uuid_version: 6
+
+    rate_limiter:
+        login_limiter:
+            policy: sliding_window
+            limit: 5
+            interval: '1 minute'
+        api_limiter:
+            policy: sliding_window
+            limit: 60
+            interval: '1 minute'
+
+when@test:
+    framework:
+        test: true

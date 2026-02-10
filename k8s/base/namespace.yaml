@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: eupay
+  labels:
+    app.kubernetes.io/name: eupay
+    app.kubernetes.io/managed-by: argocd

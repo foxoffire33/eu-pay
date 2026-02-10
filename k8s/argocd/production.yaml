@@ -1,0 +1,52 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: eupay-production
+  namespace: argocd
+  labels:
+    app.kubernetes.io/name: eupay
+    app.kubernetes.io/env: production
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+  annotations:
+    # Require manual approval for production deployments
+    notifications.argoproj.io/subscribe.on-sync-succeeded.slack: eupay-deployments
+    notifications.argoproj.io/subscribe.on-sync-failed.slack: eupay-alerts
+spec:
+  project: eupay
+
+  source:
+    repoURL: https://github.com/user/eu-pay.git
+    targetRevision: main
+    path: k8s/overlays/production
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: eupay
+
+  syncPolicy:
+    # ⚠️  Production: NO automated sync — requires manual approval
+    syncOptions:
+      - CreateNamespace=true
+      - PrunePropagationPolicy=foreground
+      - PruneLast=true
+      - ServerSideApply=true
+      - RespectIgnoreDifferences=true
+    retry:
+      limit: 5
+      backoff:
+        duration: 10s
+        factor: 2
+        maxDuration: 5m
+
+  ignoreDifferences:
+    - group: apps
+      kind: Deployment
+      jsonPointers:
+        - /spec/replicas
+    - group: autoscaling
+      kind: HorizontalPodAutoscaler
+      jsonPointers:
+        - /spec/metrics
+
+  revisionHistoryLimit: 10

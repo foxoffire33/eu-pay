@@ -1,0 +1,103 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: eupay
+
+namePrefix: staging-
+
+resources:
+  - ../../base
+
+patches:
+  # ── Scale down for staging ──
+  - target:
+      kind: Deployment
+      name: eupay-php
+    patch: |
+      - op: replace
+        path: /spec/replicas
+        value: 1
+  - target:
+      kind: Deployment
+      name: eupay-nginx
+    patch: |
+      - op: replace
+        path: /spec/replicas
+        value: 1
+  - target:
+      kind: HorizontalPodAutoscaler
+      name: eupay-php-hpa
+    patch: |
+      - op: replace
+        path: /spec/minReplicas
+        value: 1
+      - op: replace
+        path: /spec/maxReplicas
+        value: 3
+  - target:
+      kind: HorizontalPodAutoscaler
+      name: eupay-nginx-hpa
+    patch: |
+      - op: replace
+        path: /spec/minReplicas
+        value: 1
+      - op: replace
+        path: /spec/maxReplicas
+        value: 2
+
+  # ── Staging ingress: different host + staging LE issuer ──
+  - target:
+      kind: Ingress
+      name: eupay-ingress
+    patch: |
+      - op: replace
+        path: /metadata/annotations/cert-manager.io~1cluster-issuer
+        value: letsencrypt-staging
+      - op: replace
+        path: /metadata/annotations/cert-manager.io~1common-name
+        value: staging-api.eupay.eu
+      - op: replace
+        path: /spec/tls/0/hosts/0
+        value: staging-api.eupay.eu
+      - op: replace
+        path: /spec/tls/0/secretName
+        value: eupay-staging-tls
+      - op: replace
+        path: /spec/rules/0/host
+        value: staging-api.eupay.eu
+
+  # ── Smaller PostgreSQL PVC for staging ──
+  - target:
+      kind: StatefulSet
+      name: eupay-postgres
+    patch: |
+      - op: replace
+        path: /spec/volumeClaimTemplates/0/spec/resources/requests/storage
+        value: 5Gi
+
+  # ── Lower resource limits ──
+  - target:
+      kind: Deployment
+      name: eupay-php
+    patch: |
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/requests/cpu
+        value: 100m
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/requests/memory
+        value: 128Mi
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/limits/cpu
+        value: 500m
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/limits/memory
+        value: 256Mi
+
+configMapGenerator:
+  - name: eupay-config
+    behavior: merge
+    literals:
+      - APP_ENV=staging
+      - APP_DEBUG=1
+      - PSD2_API_BASE_URL=https://api-sandbox.rabobank.nl
+      - CORS_ALLOW_ORIGIN=^https://staging-app\.eupay\.eu$

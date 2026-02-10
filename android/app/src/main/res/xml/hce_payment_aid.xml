@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Registers our HCE service as a handler for payment card AIDs.
+    When a POS terminal sends a SELECT command for any of these AIDs,
+    Android routes the APDU to our PaymentHceService.
+
+    AIDs registered:
+    - Visa Debit/Credit (A0000000031010)
+    - Mastercard (A0000000041010)
+    - PPSE (Proximity Payment System Environment - 325041592E5359532E4444463031)
+-->
+<host-apdu-service xmlns:android="http://schemas.android.com/apk/res/android"
+    android:description="@string/hce_service_description"
+    android:requireDeviceUnlock="true"
+    android:apduServiceBanner="@drawable/ic_card_banner">
+
+    <!-- PPSE - always selected first by terminals -->
+    <aid-group
+        android:description="@string/aid_group_payment"
+        android:category="payment">
+        <!-- Proximity Payment System Environment -->
+        <aid-filter android:name="325041592E5359532E4444463031" />
+        <!-- Visa -->
+        <aid-filter android:name="A0000000031010" />
+        <!-- Mastercard -->
+        <aid-filter android:name="A0000000041010" />
+    </aid-group>
+
+</host-apdu-service>

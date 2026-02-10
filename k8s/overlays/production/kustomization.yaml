@@ -1,0 +1,119 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: eupay
+
+resources:
+  - ../../base
+
+patches:
+  # ── Production replicas ──
+  - target:
+      kind: Deployment
+      name: eupay-php
+    patch: |
+      - op: replace
+        path: /spec/replicas
+        value: 3
+  - target:
+      kind: Deployment
+      name: eupay-nginx
+    patch: |
+      - op: replace
+        path: /spec/replicas
+        value: 3
+
+  # ── Production HPA: higher ceiling ──
+  - target:
+      kind: HorizontalPodAutoscaler
+      name: eupay-php-hpa
+    patch: |
+      - op: replace
+        path: /spec/minReplicas
+        value: 3
+      - op: replace
+        path: /spec/maxReplicas
+        value: 20
+  - target:
+      kind: HorizontalPodAutoscaler
+      name: eupay-nginx-hpa
+    patch: |
+      - op: replace
+        path: /spec/minReplicas
+        value: 3
+      - op: replace
+        path: /spec/maxReplicas
+        value: 12
+
+  # ── Production ingress: real domain + prod LE issuer ──
+  - target:
+      kind: Ingress
+      name: eupay-ingress
+    patch: |
+      - op: replace
+        path: /metadata/annotations/cert-manager.io~1cluster-issuer
+        value: letsencrypt-prod
+      - op: replace
+        path: /metadata/annotations/cert-manager.io~1common-name
+        value: api.eupay.eu
+      - op: replace
+        path: /spec/tls/0/hosts/0
+        value: api.eupay.eu
+      - op: replace
+        path: /spec/tls/0/secretName
+        value: eupay-prod-tls
+      - op: replace
+        path: /spec/rules/0/host
+        value: api.eupay.eu
+
+  # ── Larger PostgreSQL PVC for production ──
+  - target:
+      kind: StatefulSet
+      name: eupay-postgres
+    patch: |
+      - op: replace
+        path: /spec/volumeClaimTemplates/0/spec/resources/requests/storage
+        value: 50Gi
+
+  # ── Higher resource limits for production ──
+  - target:
+      kind: Deployment
+      name: eupay-php
+    patch: |
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/requests/cpu
+        value: 500m
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/requests/memory
+        value: 512Mi
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/limits/cpu
+        value: "2"
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/limits/memory
+        value: 1Gi
+
+  # ── PDB: higher availability for prod ──
+  - target:
+      kind: PodDisruptionBudget
+      name: eupay-php-pdb
+    patch: |
+      - op: replace
+        path: /spec/minAvailable
+        value: 2
+  - target:
+      kind: PodDisruptionBudget
+      name: eupay-nginx-pdb
+    patch: |
+      - op: replace
+        path: /spec/minAvailable
+        value: 2
+
+configMapGenerator:
+  - name: eupay-config
+    behavior: merge
+    literals:
+      - APP_ENV=prod
+      - APP_DEBUG=0
+      - PSD2_API_BASE_URL=https://api.rabobank.nl
+      - CORS_ALLOW_ORIGIN=^https://app\.eupay\.eu$

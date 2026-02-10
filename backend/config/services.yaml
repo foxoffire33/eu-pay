@@ -1,0 +1,205 @@
+# config/services.yaml
+parameters:
+    psd2_webhook_secret: '%env(PSD2_WEBHOOK_SECRET)%'
+    card_encryption_key: '%env(CARD_ENCRYPTION_KEY)%'
+    hce_session_key_ttl: '%env(int:HCE_SESSION_KEY_TTL)%'
+    blind_index_key: '%env(BLIND_INDEX_KEY)%'
+
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+
+    App\:
+        resource: '../src/'
+        exclude:
+            - '../src/DependencyInjection/'
+            - '../src/Entity/'
+            - '../src/Kernel.php'
+
+    App\Service\OpenBankingService:
+        arguments:
+            $rabobankClientId: '%env(PSD2_CLIENT_ID)%'
+            $rabobankClientSecret: '%env(PSD2_CLIENT_SECRET)%'
+            $rabobankCertPath: '%env(PSD2_CERT_PATH)%'
+            $rabobankKeyPath: '%env(PSD2_KEY_PATH)%'
+            $rabobankApiBaseUrl: '%env(PSD2_API_BASE_URL)%'
+            $appCallbackUrl: '%env(APP_CALLBACK_URL)%'
+
+    App\Service\CardEncryptionService:
+        arguments:
+            $encryptionKey: '%card_encryption_key%'
+
+    App\Service\HceProvisioningService:
+        arguments:
+            $sessionKeyTtl: '%hce_session_key_ttl%'
+
+    App\Service\TopUpService:
+        arguments:
+            $creditorIban: '%env(EUPAY_CREDITOR_IBAN)%'
+            $creditorName: '%env(EUPAY_CREDITOR_NAME)%'
+
+    App\Service\Crypto\BlindIndexService:
+        arguments:
+            $blindIndexKey: '%blind_index_key%'
+
+    App\Service\Crypto\EnvelopeEncryptionService: ~
+
+    # Card Issuing — 17 EU-licensed providers for Visa/Mastercard NFC tap-to-pay
+    # Change the alias below to switch provider (zero code changes needed)
+    #
+    # ┌──────────────────┬───────────┬────────────────┬──────────────────────────┐
+    # │ Provider         │ Scheme    │ License        │ Country                  │
+    # ├──────────────────┼───────────┼────────────────┼──────────────────────────┤
+    # │ Marqeta          │ Visa      │ CBI            │ 🇮🇪 Ireland               │
+    # │ Adyen Issuing    │ Visa+MC   │ DNB            │ 🇳🇱 Netherlands            │
+    # │ Stripe Issuing   │ Visa      │ CBI            │ 🇮🇪 Ireland               │
+    # │ Enfuce           │ Visa+MC   │ FIN-FSA        │ 🇫🇮 Finland               │
+    # │ Wallester        │ Visa      │ EFSA           │ 🇪🇪 Estonia               │
+    # │ Paynetics        │ Visa+MC   │ BNB            │ 🇧🇬 Bulgaria              │
+    # │ Nexi Group       │ Visa+MC   │ Banca d'Italia │ 🇮🇹 Italy                 │
+    # │ Treezor          │ MC        │ ACPR           │ 🇫🇷 France (SocGen)       │
+    # │ Swan             │ MC        │ ACPR           │ 🇫🇷 France                │
+    # │ DECTA            │ Visa+MC   │ FCMC           │ 🇱🇻 Latvia                │
+    # │ Paynovate        │ Visa+MC   │ NBB            │ 🇧🇪 Belgium               │
+    # │ Pecunpay         │ Visa+MC   │ BdE            │ 🇪🇸 Spain                 │
+    # │ Solaris          │ Visa+MC   │ BaFin (bank)   │ 🇩🇪 Germany               │
+    # │ TransactPay      │ Visa+MC   │ MFSA           │ 🇲🇹 Malta                 │
+    # │ Vodeno/Aion      │ Visa+MC   │ NBB (bank)     │ 🇧🇪 Belgium               │
+    # │ iCard            │ Visa+MC   │ BNB            │ 🇧🇬 Bulgaria              │
+    # │ Bankable         │ Visa+MC   │ CSSF           │ 🇱🇺 Luxembourg             │
+    # └──────────────────┴───────────┴────────────────┴──────────────────────────┘
+    App\Service\CardIssuing\CardIssuerInterface:
+        alias: App\Service\CardIssuing\MarqetaCardIssuer
+
+    # 🇮🇪 Marqeta Europe Ltd — CBI Ireland, Visa
+    App\Service\CardIssuing\MarqetaCardIssuer:
+        arguments:
+            $baseUrl: '%env(CARD_ISSUER_API_URL)%'
+            $applicationToken: '%env(CARD_ISSUER_APP_TOKEN)%'
+            $adminAccessToken: '%env(CARD_ISSUER_ADMIN_TOKEN)%'
+            $cardProductToken: '%env(CARD_ISSUER_PRODUCT_TOKEN)%'
+            $fundingSourceToken: '%env(CARD_ISSUER_FUNDING_TOKEN)%'
+
+    # 🇳🇱 Adyen N.V. — DNB Netherlands, Visa+Mastercard
+    App\Service\CardIssuing\AdyenCardIssuer:
+        arguments:
+            $baseUrl: '%env(ADYEN_ISSUING_API_URL)%'
+            $apiKey: '%env(ADYEN_ISSUING_API_KEY)%'
+            $balanceAccountId: '%env(ADYEN_BALANCE_ACCOUNT_ID)%'
+            $balancePlatform: '%env(ADYEN_BALANCE_PLATFORM)%'
+
+    # 🇮🇪 Stripe Payments Europe Ltd — CBI Ireland, Visa
+    App\Service\CardIssuing\StripeCardIssuer:
+        arguments:
+            $secretKey: '%env(STRIPE_ISSUING_SECRET_KEY)%'
+
+    # 🇫🇮 Enfuce Financial Services — FIN-FSA Finland, Visa+Mastercard
+    App\Service\CardIssuing\EnfuceCardIssuer:
+        arguments:
+            $baseUrl: '%env(ENFUCE_API_URL)%'
+            $apiKey: '%env(ENFUCE_API_KEY)%'
+            $apiSecret: '%env(ENFUCE_API_SECRET)%'
+            $programId: '%env(ENFUCE_PROGRAM_ID)%'
+
+    # 🇪🇪 Wallester AS — Estonian FSA, Visa
+    App\Service\CardIssuing\WallesterCardIssuer:
+        arguments:
+            $baseUrl: '%env(WALLESTER_API_URL)%'
+            $apiKey: '%env(WALLESTER_API_KEY)%'
+            $apiSecret: '%env(WALLESTER_API_SECRET)%'
+            $productId: '%env(WALLESTER_PRODUCT_ID)%'
+
+    # 🇧🇬 Paynetics AD — BNB Bulgaria, Visa+Mastercard
+    App\Service\CardIssuing\PayneticsCardIssuer:
+        arguments:
+            $baseUrl: '%env(PAYNETICS_API_URL)%'
+            $apiKey: '%env(PAYNETICS_API_KEY)%'
+            $clientId: '%env(PAYNETICS_CLIENT_ID)%'
+            $programmeId: '%env(PAYNETICS_PROGRAMME_ID)%'
+
+    # 🇮🇹 Nexi Group S.p.A. — Banca d'Italia, Visa+Mastercard
+    App\Service\CardIssuing\NexiCardIssuer:
+        arguments:
+            $baseUrl: '%env(NEXI_ISSUING_API_URL)%'
+            $apiKey: '%env(NEXI_ISSUING_API_KEY)%'
+            $merchantId: '%env(NEXI_MERCHANT_ID)%'
+            $programmeToken: '%env(NEXI_PROGRAMME_TOKEN)%'
+
+    # 🇫🇷 Treezor (Société Générale) — ACPR France, Mastercard
+    App\Service\CardIssuing\TreezorCardIssuer:
+        arguments:
+            $baseUrl: '%env(TREEZOR_API_URL)%'
+            $clientId: '%env(TREEZOR_CLIENT_ID)%'
+            $clientSecret: '%env(TREEZOR_CLIENT_SECRET)%'
+            $walletTypeId: '%env(TREEZOR_WALLET_TYPE_ID)%'
+
+    # 🇫🇷 Swan SAS — ACPR France, Mastercard
+    App\Service\CardIssuing\SwanCardIssuer:
+        arguments:
+            $baseUrl: '%env(SWAN_API_URL)%'
+            $projectId: '%env(SWAN_PROJECT_ID)%'
+            $accessToken: '%env(SWAN_ACCESS_TOKEN)%'
+
+    # 🇱🇻 DECTA — FCMC Latvia, Visa+Mastercard
+    App\Service\CardIssuing\DectaCardIssuer:
+        arguments:
+            $baseUrl: '%env(DECTA_API_URL)%'
+            $apiKey: '%env(DECTA_API_KEY)%'
+            $programmeId: '%env(DECTA_PROGRAMME_ID)%'
+
+    # 🇧🇪 Paynovate SA — NBB Belgium, Visa+Mastercard+UnionPay
+    App\Service\CardIssuing\PaynovateCardIssuer:
+        arguments:
+            $baseUrl: '%env(PAYNOVATE_API_URL)%'
+            $apiKey: '%env(PAYNOVATE_API_KEY)%'
+            $merchantId: '%env(PAYNOVATE_MERCHANT_ID)%'
+
+    # 🇪🇸 Pecunpay (Pecunia Cards EDE) — Bank of Spain, Visa+MC+UnionPay
+    App\Service\CardIssuing\PecunpayCardIssuer:
+        arguments:
+            $baseUrl: '%env(PECUNPAY_API_URL)%'
+            $apiKey: '%env(PECUNPAY_API_KEY)%'
+            $programmeId: '%env(PECUNPAY_PROGRAMME_ID)%'
+
+    # 🇩🇪 Solaris SE — BaFin Germany (full banking licence), Visa+Mastercard
+    App\Service\CardIssuing\SolarisCardIssuer:
+        arguments:
+            $baseUrl: '%env(SOLARIS_API_URL)%'
+            $clientId: '%env(SOLARIS_CLIENT_ID)%'
+            $clientSecret: '%env(SOLARIS_CLIENT_SECRET)%'
+            $partnerId: '%env(SOLARIS_PARTNER_ID)%'
+
+    # 🇲🇹 TransactPay — MFSA Malta, Visa+Mastercard
+    App\Service\CardIssuing\TransactPayCardIssuer:
+        arguments:
+            $baseUrl: '%env(TRANSACTPAY_API_URL)%'
+            $apiKey: '%env(TRANSACTPAY_API_KEY)%'
+            $programmeToken: '%env(TRANSACTPAY_PROGRAMME_TOKEN)%'
+
+    # 🇧🇪 Vodeno / Aion Bank — NBB Belgium (full banking licence), Visa+MC
+    App\Service\CardIssuing\VodenoCardIssuer:
+        arguments:
+            $baseUrl: '%env(VODENO_API_URL)%'
+            $clientId: '%env(VODENO_CLIENT_ID)%'
+            $clientSecret: '%env(VODENO_CLIENT_SECRET)%'
+
+    # 🇧🇬 iCard AD — BNB Bulgaria, Visa+Mastercard
+    App\Service\CardIssuing\ICardCardIssuer:
+        arguments:
+            $baseUrl: '%env(ICARD_API_URL)%'
+            $apiKey: '%env(ICARD_API_KEY)%'
+            $merchantId: '%env(ICARD_MERCHANT_ID)%'
+
+    # 🇱🇺 Bankable — CSSF Luxembourg, Visa+Mastercard
+    App\Service\CardIssuing\BankableCardIssuer:
+        arguments:
+            $baseUrl: '%env(BANKABLE_API_URL)%'
+            $apiKey: '%env(BANKABLE_API_KEY)%'
+            $programmeId: '%env(BANKABLE_PROGRAMME_ID)%'
+
+    # Digital Euro (ECB CBDC) — stub until pilot 2027 / issuance 2029
+    App\Service\DigitalEuro\DigitalEuroInterface:
+        alias: App\Service\DigitalEuro\DigitalEuroStub
+
+    App\Service\DigitalEuro\DigitalEuroStub: ~

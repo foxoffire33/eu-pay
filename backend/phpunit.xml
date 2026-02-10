@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
+         bootstrap="vendor/autoload.php"
+         colors="true"
+         executionOrder="depends,defects"
+         failOnRisky="true"
+         failOnWarning="true">
+    <testsuites>
+        <testsuite name="Unit">
+            <directory>tests/Unit</directory>
+        </testsuite>
+        <testsuite name="Integration">
+            <directory>tests/Integration</directory>
+        </testsuite>
+        <testsuite name="Functional">
+            <directory>tests/Functional</directory>
+        </testsuite>
+    </testsuites>
+
+    <php>
+        <ini name="display_errors" value="1"/>
+        <ini name="error_reporting" value="-1"/>
+        <server name="APP_ENV" value="test" force="true"/>
+        <server name="SHELL_VERBOSITY" value="-1"/>
+        <server name="KERNEL_CLASS" value="App\Kernel"/>
+        <env name="CARD_ENCRYPTION_KEY" value="0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"/>
+        <env name="HCE_SESSION_KEY_TTL" value="300"/>
+        <env name="PSD2_API_BASE_URL" value="https://api-sandbox.rabobank.nl"/>
+        <env name="PSD2_CLIENT_ID" value="test-key"/>
+        <env name="PSD2_PARTNER_ID" value="test-partner"/>
+        <env name="PSD2_WEBHOOK_SECRET" value="test-webhook-secret"/>
+        <env name="CARD_ISSUER_API_URL" value="https://sandbox-api.marqeta.com"/>
+        <env name="CARD_ISSUER_APP_TOKEN" value="test-app-token"/>
+        <env name="CARD_ISSUER_ADMIN_TOKEN" value="test-admin-token"/>
+        <env name="CARD_ISSUER_PRODUCT_TOKEN" value="test-product"/>
+        <env name="CARD_ISSUER_FUNDING_TOKEN" value="test-funding"/>
+    </php>
+
+    <source>
+        <include>
+            <directory suffix=".php">src</directory>
+        </include>
+    </source>
+</phpunit>

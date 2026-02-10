@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: eupay-redis
+  namespace: eupay
+  labels:
+    app: eupay-redis
+spec:
+  selector:
+    app: eupay-redis
+  ports:
+    - port: 6379
+      targetPort: 6379
+      protocol: TCP
+  type: ClusterIP

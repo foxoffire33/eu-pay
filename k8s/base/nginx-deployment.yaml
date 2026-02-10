@@ -1,0 +1,132 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: eupay-nginx
+  namespace: eupay
+  labels:
+    app: eupay-nginx
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: eupay-nginx
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  template:
+    metadata:
+      labels:
+        app: eupay-nginx
+    spec:
+      securityContext:
+        runAsNonRoot: false  # nginx needs root to bind port 80
+
+      containers:
+        - name: nginx
+          image: eupay/nginx:latest
+          ports:
+            - containerPort: 80
+              protocol: TCP
+          volumeMounts:
+            - name: nginx-config
+              mountPath: /etc/nginx/conf.d/eupay.conf
+              subPath: eupay-k8s.conf
+            - name: public-assets
+              mountPath: /app/public
+              readOnly: true
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 80
+            initialDelaySeconds: 3
+            periodSeconds: 5
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+              add: ["NET_BIND_SERVICE"]
+
+      volumes:
+        - name: nginx-config
+          configMap:
+            name: eupay-nginx-config
+        - name: public-assets
+          emptyDir: {}
+
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: DoNotSchedule
+          labelSelector:
+            matchLabels:
+              app: eupay-nginx
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: eupay-nginx-config
+  namespace: eupay
+data:
+  eupay-k8s.conf: |
+    upstream php-fpm {
+        server eupay-php:9000;
+    }
+
+    server {
+        listen 80;
+        server_name _;
+
+        root /app/public;
+        index index.php;
+
+        # Security headers (TLS terminated at ingress)
+        add_header X-Frame-Options "DENY" always;
+        add_header X-Content-Type-Options "nosniff" always;
+        add_header X-XSS-Protection "1; mode=block" always;
+        add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+
+        location / {
+            try_files $uri /index.php$is_args$args;
+        }
+
+        location ~ ^/index\.php(/|$) {
+            fastcgi_pass php-fpm;
+            fastcgi_split_path_info ^(.+\.php)(/.*)$;
+            include fastcgi_params;
+            fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
+            fastcgi_param DOCUMENT_ROOT $realpath_root;
+            fastcgi_buffer_size 32k;
+            fastcgi_buffers 16 16k;
+            internal;
+        }
+
+        location ~ \.php$ {
+            return 404;
+        }
+
+        location /health {
+            access_log off;
+            return 200 '{"status":"ok"}';
+            add_header Content-Type application/json;
+        }
+
+        location ~* \.(js|css|png|jpg|ico|svg|woff2?)$ {
+            expires 30d;
+            add_header Cache-Control "public, immutable";
+        }
+    }

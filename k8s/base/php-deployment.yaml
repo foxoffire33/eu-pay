@@ -1,0 +1,118 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: eupay-php
+  namespace: eupay
+  labels:
+    app: eupay-php
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: eupay-php
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  template:
+    metadata:
+      labels:
+        app: eupay-php
+    spec:
+      serviceAccountName: default
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+
+      initContainers:
+        # Run migrations before app starts
+        - name: migrate
+          image: eupay/backend:latest
+          command: ["php", "bin/console", "doctrine:migrations:migrate", "--no-interaction", "--allow-no-migration"]
+          envFrom:
+            - configMapRef:
+                name: eupay-config
+            - secretRef:
+                name: eupay-secrets
+          env:
+            - name: JWT_SECRET_KEY
+              value: "/app/config/jwt/private.pem"
+            - name: JWT_PUBLIC_KEY
+              value: "/app/config/jwt/public.pem"
+          volumeMounts:
+            - name: jwt-keys
+              mountPath: /app/config/jwt
+              readOnly: true
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: false
+
+      containers:
+        - name: php-fpm
+          image: eupay/backend:latest
+          ports:
+            - containerPort: 9000
+              protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: eupay-config
+            - secretRef:
+                name: eupay-secrets
+          env:
+            - name: JWT_SECRET_KEY
+              value: "/app/config/jwt/private.pem"
+            - name: JWT_PUBLIC_KEY
+              value: "/app/config/jwt/public.pem"
+          volumeMounts:
+            - name: jwt-keys
+              mountPath: /app/config/jwt
+              readOnly: true
+            - name: symfony-cache
+              mountPath: /app/var
+          resources:
+            requests:
+              cpu: 200m
+              memory: 256Mi
+            limits:
+              cpu: "1"
+              memory: 512Mi
+          livenessProbe:
+            exec:
+              command:
+                - php-fpm-healthcheck
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
+          readinessProbe:
+            exec:
+              command:
+                - php-fpm-healthcheck
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 2
+            failureThreshold: 2
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: false
+            capabilities:
+              drop: ["ALL"]
+
+      volumes:
+        - name: jwt-keys
+          secret:
+            secretName: eupay-jwt-keys
+            defaultMode: 0400
+        - name: symfony-cache
+          emptyDir: {}
+
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: DoNotSchedule
+          labelSelector:
+            matchLabels:
+              app: eupay-php

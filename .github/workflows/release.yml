@@ -1,0 +1,208 @@
+name: CI/CD — Test, Build & Release
+
+on:
+  push:
+    branches: [main, develop]
+    tags: ['v*']
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: write  # needed for creating releases
+
+env:
+  JAVA_VERSION: '21'
+  PHP_VERSION: '8.4'
+
+jobs:
+  # ──────────────────────────────────────────────────────
+  # Backend tests (PHPUnit)
+  # ──────────────────────────────────────────────────────
+  backend-tests:
+    name: Backend Tests (PHP ${{ env.PHP_VERSION }})
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ env.PHP_VERSION }}
+          extensions: mbstring, xml, ctype, iconv, intl, pdo_pgsql, sodium, openssl
+          coverage: none
+
+      - name: Get Composer cache dir
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('backend/composer.lock', 'backend/composer.json') }}
+          restore-keys: ${{ runner.os }}-composer-
+
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress --no-interaction
+
+      - name: Create .env.test
+        run: |
+          cat > .env.test << 'EOF'
+          APP_ENV=test
+          APP_SECRET=test-secret-not-for-production
+          DATABASE_URL="sqlite:///%kernel.project_dir%/var/test.db"
+          JWT_SECRET_KEY=%kernel.project_dir%/config/jwt/private-test.pem
+          JWT_PUBLIC_KEY=%kernel.project_dir%/config/jwt/public-test.pem
+          JWT_PASSPHRASE=test
+          JWT_TOKEN_TTL=3600
+          PSD2_API_BASE_URL=https://api-sandbox.rabobank.nl
+          PSD2_CLIENT_ID=test-key
+          PSD2_WEBHOOK_SECRET=test-webhook-secret
+          PSD2_PARTNER_ID=test-partner
+          CARD_ENCRYPTION_KEY=0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+          HCE_SESSION_KEY_TTL=300
+          BLIND_INDEX_KEY=abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789
+          EOF
+
+      - name: Run PHPUnit
+        run: vendor/bin/phpunit --testdox
+
+  # ──────────────────────────────────────────────────────
+  # Android unit tests
+  # ──────────────────────────────────────────────────────
+  android-tests:
+    name: Android Unit Tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: android
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup JDK ${{ env.JAVA_VERSION }}
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: 'temurin'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          cache-read-only: ${{ github.ref != 'refs/heads/main' }}
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Run unit tests
+        run: ./gradlew testDebugUnitTest --no-daemon
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-test-results
+          path: android/app/build/reports/tests/
+          retention-days: 14
+
+  # ──────────────────────────────────────────────────────
+  # Build APK + Create GitHub Release (only on v* tags)
+  # ──────────────────────────────────────────────────────
+  release:
+    name: Build APK & Release
+    needs: [backend-tests, android-tests]
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: android
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # full history for git describe
+
+      - name: Extract version from tag
+        id: version
+        run: |
+          TAG=${GITHUB_REF#refs/tags/}
+          VERSION=${TAG#v}
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Building version: $VERSION (tag: $TAG)"
+
+      - name: Setup JDK ${{ env.JAVA_VERSION }}
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: 'temurin'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      # ── Decode signing key from secrets ──
+      - name: Decode keystore
+        if: env.KEYSTORE_BASE64 != ''
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+        run: echo "$KEYSTORE_BASE64" | base64 -d > app/release.keystore
+
+      # ── Build release APK ──
+      - name: Build release APK
+        env:
+          RELEASE_STORE_FILE: ${{ secrets.KEYSTORE_BASE64 != '' && 'release.keystore' || '' }}
+          RELEASE_STORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          RELEASE_KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          RELEASE_KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          ./gradlew assembleRelease \
+            -PVERSION_NAME=${{ steps.version.outputs.version }} \
+            -PAPI_BASE_URL="${{ vars.API_BASE_URL || 'https://api.eupay.eu' }}" \
+            --no-daemon
+
+      # ── Rename APK with version ──
+      - name: Rename APK
+        run: |
+          APK_PATH=$(find app/build/outputs/apk/release -name "*.apk" | head -1)
+          if [ -z "$APK_PATH" ]; then
+            echo "ERROR: No APK found!" && exit 1
+          fi
+          VERSION=${{ steps.version.outputs.version }}
+          cp "$APK_PATH" "app/build/outputs/apk/release/EUPay-${VERSION}.apk"
+          echo "APK ready: EUPay-${VERSION}.apk"
+          ls -la app/build/outputs/apk/release/
+
+      # ── Create GitHub Release ──
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.version.outputs.tag }}
+          name: EU Pay ${{ steps.version.outputs.tag }}
+          body: |
+            ## EU Pay ${{ steps.version.outputs.tag }}
+
+            ### Download
+            Install the APK on your NFC-capable Android device (API 26+).
+
+            ### What's included
+            - 🔒 Zero-knowledge encryption (RSA-4096 + AES-256-GCM)
+            - 💳 Direct NFC tap-to-pay via HCE (no Google Pay)
+            - 🇪🇺 EU-only, GDPR/PSD2/ePrivacy compliant
+            - 🏦 Powered by PSD2 Banking API (German banking license)
+
+            ### Checksums
+            ```
+            SHA-256: ${{ steps.version.outputs.version }}
+            ```
+          files: |
+            android/app/build/outputs/apk/release/EUPay-${{ steps.version.outputs.version }}.apk
+          draft: false
+          prerelease: ${{ contains(steps.version.outputs.version, 'alpha') || contains(steps.version.outputs.version, 'beta') || contains(steps.version.outputs.version, 'rc') }}
+          generate_release_notes: true

@@ -1,0 +1,126 @@
+# ╔══════════════════════════════════════════════════════════╗
+# ║  EU Pay — Local Development Stack                       ║
+# ║  HTTPS via mkcert · PHP 8.4 · Symfony 8 · PostgreSQL   ║
+# ╚══════════════════════════════════════════════════════════╝
+#
+# Quick start:
+#   make certs        # generate mkcert HTTPS certificates
+#   make up           # start all services
+#   make test         # run PHPUnit
+#
+# Manual:
+#   docker compose up -d
+#   docker compose exec php composer install
+#   docker compose exec php bin/console doctrine:migrations:migrate
+#   open https://eupay.localhost
+
+services:
+
+  # ── PHP 8.4 FPM ──────────────────────────────────────
+  php:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+    container_name: eupay-php
+    restart: unless-stopped
+    volumes:
+      - ./backend:/app
+      - ./docker/php/php-fpm.d/www.conf:/usr/local/etc/php-fpm.d/zzz-eupay.conf:ro
+    environment:
+      APP_ENV: dev
+      APP_DEBUG: 1
+      APP_SECRET: change-me-in-production
+      DATABASE_URL: "postgresql://eupay:eupay_secret@postgres:5432/eupay?serverVersion=16&charset=utf8"
+      JWT_SECRET_KEY: "%kernel.project_dir%/config/jwt/private.pem"
+      JWT_PUBLIC_KEY: "%kernel.project_dir%/config/jwt/public.pem"
+      JWT_PASSPHRASE: eupay-dev-passphrase
+      JWT_TOKEN_TTL: 3600
+      PSD2_API_BASE_URL: "https://api-sandbox.rabobank.nl"
+      PSD2_CLIENT_ID: "${PSD2_CLIENT_ID:-sandbox-key}"
+      PSD2_PARTNER_ID: "${PSD2_PARTNER_ID:-sandbox-partner}"
+      PSD2_WEBHOOK_SECRET: "${PSD2_WEBHOOK_SECRET:-dev-webhook-secret}"
+      BLIND_INDEX_KEY: "${BLIND_INDEX_KEY:-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef}"
+      CARD_ENCRYPTION_KEY: "${CARD_ENCRYPTION_KEY:-abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789}"
+      HCE_SESSION_KEY_TTL: 300
+      PSD2_CLIENT_ID: "${PSD2_CLIENT_ID:-sandbox-psd2-client}"
+      PSD2_CLIENT_SECRET: "${PSD2_CLIENT_SECRET:-sandbox-psd2-secret}"
+      PSD2_CERT_PATH: "/app/config/psd2/qwac.pem"
+      PSD2_KEY_PATH: "/app/config/psd2/qwac-key.pem"
+      PSD2_API_BASE_URL: "https://api-sandbox.rabobank.nl"
+      APP_CALLBACK_URL: "https://eupay.localhost"
+      CARD_ISSUER_API_URL: "https://sandbox-api.marqeta.com"
+      CARD_ISSUER_APP_TOKEN: "${CARD_ISSUER_APP_TOKEN:-sandbox-app-token}"
+      CARD_ISSUER_ADMIN_TOKEN: "${CARD_ISSUER_ADMIN_TOKEN:-sandbox-admin-token}"
+      CARD_ISSUER_PRODUCT_TOKEN: "${CARD_ISSUER_PRODUCT_TOKEN:-sandbox-product}"
+      CARD_ISSUER_FUNDING_TOKEN: "${CARD_ISSUER_FUNDING_TOKEN:-sandbox-funding}"
+      EUPAY_CREDITOR_IBAN: "${EUPAY_CREDITOR_IBAN:-DE00000000000000000000}"
+      EUPAY_CREDITOR_NAME: "${EUPAY_CREDITOR_NAME:-EU Pay GmbH}"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - eupay
+
+  # ── Nginx (HTTPS via mkcert) ─────────────────────────
+  nginx:
+    build:
+      context: .
+      dockerfile: docker/nginx/Dockerfile
+    container_name: eupay-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./backend/public:/app/public:ro
+      - ./docker/certs:/etc/nginx/certs:ro
+    depends_on:
+      - php
+    networks:
+      - eupay
+
+  # ── PostgreSQL 16 ────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    container_name: eupay-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: eupay
+      POSTGRES_USER: eupay
+      POSTGRES_PASSWORD: eupay_secret
+    ports:
+      - "5432:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U eupay"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    networks:
+      - eupay
+
+  # ── Redis (sessions, messenger, rate-limiter) ────────
+  redis:
+    image: redis:7-alpine
+    container_name: eupay-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    networks:
+      - eupay
+
+volumes:
+  pg_data:
+  redis_data:
+
+networks:
+  eupay:
+    driver: bridge

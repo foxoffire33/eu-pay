@@ -1,0 +1,86 @@
+# ── Default deny all ingress in eupay namespace ──────
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-ingress
+  namespace: eupay
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+---
+# ── Nginx: allow from ingress controller + internet ──
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-nginx-ingress
+  namespace: eupay
+spec:
+  podSelector:
+    matchLabels:
+      app: eupay-nginx
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: ingress-nginx
+      ports:
+        - port: 80
+          protocol: TCP
+---
+# ── PHP-FPM: allow only from Nginx ──────────────────
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-php-from-nginx
+  namespace: eupay
+spec:
+  podSelector:
+    matchLabels:
+      app: eupay-php
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app: eupay-nginx
+      ports:
+        - port: 9000
+          protocol: TCP
+---
+# ── PostgreSQL: allow only from PHP ──────────────────
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-postgres-from-php
+  namespace: eupay
+spec:
+  podSelector:
+    matchLabels:
+      app: eupay-postgres
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app: eupay-php
+      ports:
+        - port: 5432
+          protocol: TCP
+---
+# ── Redis: allow only from PHP ───────────────────────
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-redis-from-php
+  namespace: eupay
+spec:
+  podSelector:
+    matchLabels:
+      app: eupay-redis
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app: eupay-php
+      ports:
+        - port: 6379
+          protocol: TCP

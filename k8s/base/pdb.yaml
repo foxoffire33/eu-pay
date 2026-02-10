@@ -1,0 +1,21 @@
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: eupay-php-pdb
+  namespace: eupay
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: eupay-php
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: eupay-nginx-pdb
+  namespace: eupay
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: eupay-nginx
