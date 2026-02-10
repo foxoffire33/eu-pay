@@ -23,5 +23,7 @@ resources:
   - pdb.yaml
   - networkpolicy.yaml
 
-commonLabels:
-  app.kubernetes.io/part-of: eupay
+labels:
+  - pairs:
+      app.kubernetes.io/part-of: eupay
+    includeSelectors: false

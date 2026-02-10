@@ -19,7 +19,7 @@ jobs:
   # Backend tests (PHPUnit)
   # ──────────────────────────────────────────────────────
   backend-tests:
-    name: Backend Tests (PHP ${{ env.PHP_VERSION }})
+    name: Backend Tests (PHP 8.4)
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -84,7 +84,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup JDK ${{ env.JAVA_VERSION }}
+      - name: Setup JDK
         uses: actions/setup-java@v4
         with:
           java-version: ${{ env.JAVA_VERSION }}
@@ -171,7 +171,7 @@ jobs:
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "Building version: $VERSION (tag: $TAG)"
 
-      - name: Setup JDK ${{ env.JAVA_VERSION }}
+      - name: Setup JDK
         uses: actions/setup-java@v4
         with:
           java-version: ${{ env.JAVA_VERSION }}
