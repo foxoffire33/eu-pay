@@ -69,7 +69,7 @@ patches:
     patch: |
       - op: replace
         path: /metadata/annotations/cert-manager.io~1cluster-issuer
-        value: letsencrypt-staging
+        value: letsencrypt-prod
       - op: replace
         path: /metadata/annotations/cert-manager.io~1common-name
         value: staging.eu-pay.nl
@@ -78,7 +78,7 @@ patches:
         value: staging.eu-pay.nl
       - op: replace
         path: /spec/tls/0/hosts/1
-        value: staging-api.eu-pay.nl
+        value: api.staging.eu-pay.nl
       - op: replace
         path: /spec/tls/0/secretName
         value: eupay-staging-tls
@@ -87,7 +87,7 @@ patches:
         value: staging.eu-pay.nl
       - op: replace
         path: /spec/rules/1/host
-        value: staging-api.eu-pay.nl
+        value: api.staging.eu-pay.nl
 
   # ── Smaller PostgreSQL PVC for staging ──
   - target:

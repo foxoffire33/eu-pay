@@ -46,6 +46,8 @@ spec:
             - name: jwt-keys
               mountPath: /app/config/jwt
               readOnly: true
+            - name: symfony-cache
+              mountPath: /app/var
           securityContext:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: false
