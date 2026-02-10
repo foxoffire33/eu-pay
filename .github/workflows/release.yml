@@ -8,7 +8,8 @@ on:
     branches: [main]
 
 permissions:
-  contents: write  # needed for creating releases
+  contents: write    # needed for creating releases & committing image tags
+  packages: write    # needed for pushing to ghcr.io
 
 env:
   JAVA_VERSION: '21'
@@ -144,6 +145,95 @@ jobs:
           name: landing-page-dist
           path: landing-page/dist/
           retention-days: 7
+
+  # ──────────────────────────────────────────────────────
+  # Build & push Docker images to GitHub Container Registry
+  # ──────────────────────────────────────────────────────
+  docker-images:
+    name: Build & Push Docker Images
+    needs: [backend-tests, landing-page-build]
+    if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+
+    env:
+      IMAGE_PREFIX: ghcr.io/foxoffire33/eu-pay
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Compute image tag
+        id: meta
+        run: |
+          SHA_SHORT=$(git rev-parse --short HEAD)
+          SHA_TAG="sha-${SHA_SHORT}"
+          echo "sha_tag=${SHA_TAG}" >> $GITHUB_OUTPUT
+          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then
+            echo "version_tag=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build & push PHP image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: docker/php/Dockerfile
+          push: true
+          tags: |
+            ${{ env.IMAGE_PREFIX }}/php:${{ steps.meta.outputs.sha_tag }}
+            ${{ env.IMAGE_PREFIX }}/php:latest
+          cache-from: type=gha,scope=php
+          cache-to: type=gha,scope=php,mode=max
+
+      - name: Build & push Nginx image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: docker/nginx/Dockerfile
+          push: true
+          tags: |
+            ${{ env.IMAGE_PREFIX }}/nginx:${{ steps.meta.outputs.sha_tag }}
+            ${{ env.IMAGE_PREFIX }}/nginx:latest
+          cache-from: type=gha,scope=nginx
+          cache-to: type=gha,scope=nginx,mode=max
+
+      - name: Build & push Landing Page image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: docker/landing-page/Dockerfile
+          push: true
+          tags: |
+            ${{ env.IMAGE_PREFIX }}/landing-page:${{ steps.meta.outputs.sha_tag }}
+            ${{ env.IMAGE_PREFIX }}/landing-page:latest
+          cache-from: type=gha,scope=landing
+          cache-to: type=gha,scope=landing,mode=max
+
+      # Update k8s manifests with the new SHA tag (only on main branch)
+      - name: Update k8s image tags
+        if: github.ref == 'refs/heads/main'
+        run: |
+          TAG="${{ steps.meta.outputs.sha_tag }}"
+          sed -i "s|newTag: .*|newTag: ${TAG}|g" k8s/base/kustomization.yaml
+
+      - name: Commit updated image tags
+        if: github.ref == 'refs/heads/main'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add k8s/base/kustomization.yaml
+          git diff --cached --quiet || (
+            git commit -m "chore(k8s): update image tags to ${{ steps.meta.outputs.sha_tag }} [skip ci]" &&
+            git push origin HEAD:refs/heads/main
+          )
 
   # ──────────────────────────────────────────────────────
   # Build APK + Create GitHub Release (only on v* tags)

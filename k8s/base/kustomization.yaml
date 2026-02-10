@@ -46,6 +46,14 @@ configMapGenerator:
 generatorOptions:
   disableNameSuffixHash: true
 
+images:
+  - name: ghcr.io/foxoffire33/eu-pay/php
+    newTag: latest
+  - name: ghcr.io/foxoffire33/eu-pay/nginx
+    newTag: latest
+  - name: ghcr.io/foxoffire33/eu-pay/landing-page
+    newTag: latest
+
 labels:
   - pairs:
       app.kubernetes.io/part-of: eupay

@@ -25,7 +25,7 @@ spec:
 
       containers:
         - name: nginx
-          image: eupay/nginx:latest
+          image: ghcr.io/foxoffire33/eu-pay/nginx:latest
           ports:
             - containerPort: 80
               protocol: TCP

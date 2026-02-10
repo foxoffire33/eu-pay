@@ -24,9 +24,6 @@ android/.cxx/
 *.ap_
 *.dex
 
-# Gradle wrapper jar (downloadable)
-android/gradle/wrapper/gradle-wrapper.jar
-
 # ── Backend (PHP / Symfony) ──
 backend/vendor/
 backend/var/

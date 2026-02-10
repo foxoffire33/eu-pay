@@ -9,6 +9,8 @@ use App\Entity\User;
 use App\Repository\CardRepository;
 use App\Service\CardIssuing\CardIssuerInterface;
 use App\Service\CardService;
+use App\Service\DirectDebitService;
+use App\Service\LinkedBankAccountService;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -17,6 +19,8 @@ use Psr\Log\NullLogger;
 class CardServiceTest extends TestCase
 {
     private CardIssuerInterface&MockObject $issuer;
+    private LinkedBankAccountService&MockObject $bankAccountService;
+    private DirectDebitService&MockObject $directDebitService;
     private EntityManagerInterface&MockObject $em;
     private CardRepository&MockObject $cardRepo;
     private CardService $service;
@@ -24,11 +28,15 @@ class CardServiceTest extends TestCase
     protected function setUp(): void
     {
         $this->issuer = $this->createMock(CardIssuerInterface::class);
+        $this->bankAccountService = $this->createMock(LinkedBankAccountService::class);
+        $this->directDebitService = $this->createMock(DirectDebitService::class);
         $this->em = $this->createMock(EntityManagerInterface::class);
         $this->cardRepo = $this->createMock(CardRepository::class);
 
         $this->service = new CardService(
             $this->issuer,
+            $this->bankAccountService,
+            $this->directDebitService,
             $this->em,
             $this->cardRepo,
             new NullLogger(),
@@ -40,6 +48,11 @@ class CardServiceTest extends TestCase
         $user = $this->createMock(User::class);
         $user->method('getId')->willReturn(new \Symfony\Component\Uid\UuidV6());
         $user->method('getExternalAccountId')->willReturn('iban-123');
+
+        // Simulate active bank account and mandate
+        $activeAccount = $this->createMock(\App\Entity\LinkedBankAccount::class);
+        $this->bankAccountService->method('getActiveAccount')->willReturn($activeAccount);
+        $this->directDebitService->method('hasActiveMandate')->willReturn(true);
 
         $this->issuer->method('createVirtualCard')->willReturn([
             'cardId' => 'marqeta-card-abc',

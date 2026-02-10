@@ -27,7 +27,7 @@ spec:
 
       containers:
         - name: landing
-          image: eupay/landing-page:latest
+          image: ghcr.io/foxoffire33/eu-pay/landing-page:latest
           ports:
             - containerPort: 80
               protocol: TCP

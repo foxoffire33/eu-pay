@@ -30,7 +30,7 @@ spec:
       initContainers:
         # Run migrations before app starts
         - name: migrate
-          image: eupay/backend:latest
+          image: ghcr.io/foxoffire33/eu-pay/php:latest
           command: ["php", "bin/console", "doctrine:migrations:migrate", "--no-interaction", "--allow-no-migration"]
           envFrom:
             - configMapRef:
@@ -52,7 +52,7 @@ spec:
 
       containers:
         - name: php-fpm
-          image: eupay/backend:latest
+          image: ghcr.io/foxoffire33/eu-pay/php:latest
           ports:
             - containerPort: 9000
               protocol: TCP
