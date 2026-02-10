@@ -39,7 +39,7 @@ class User implements UserInterface
 
     // ── Display name (required for passkey registration) ──
 
-    #[ORM\Column(length: 100)]
+    #[ORM\Column(length: 130)]
     private string $displayName = '';
 
     // ── Encrypted PII (opaque blobs — backend cannot read) ──

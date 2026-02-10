@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="nl.delaparra_services.apps.eupay.service.P2PServiceTest" tests="16" skipped="0" failures="0" errors="0" timestamp="2026-02-10T21:11:06.204Z" hostname="EliteBook-X" time="0.031">
+<testsuite name="nl.delaparra_services.apps.eupay.service.P2PServiceTest" tests="16" skipped="0" failures="0" errors="0" timestamp="2026-02-10T22:03:48.527Z" hostname="EliteBook-X" time="0.036">
   <properties/>
-  <testcase name="empty string fails" classname="nl.delaparra_services.apps.eupay.service.P2PServiceTest" time="0.026"/>
+  <testcase name="empty string fails" classname="nl.delaparra_services.apps.eupay.service.P2PServiceTest" time="0.03"/>
   <testcase name="valid German IBAN passes" classname="nl.delaparra_services.apps.eupay.service.P2PServiceTest" time="0.001"/>
   <testcase name="IBAN too short fails" classname="nl.delaparra_services.apps.eupay.service.P2PServiceTest" time="0.0"/>
-  <testcase name="case insensitive IBAN passes" classname="nl.delaparra_services.apps.eupay.service.P2PServiceTest" time="0.001"/>
-  <testcase name="non-EU IBAN rejected" classname="nl.delaparra_services.apps.eupay.service.P2PServiceTest" time="0.0"/>
-  <testcase name="valid Dutch IBAN passes" classname="nl.delaparra_services.apps.eupay.service.P2PServiceTest" time="0.001"/>
-  <testcase name="valid French IBAN passes" classname="nl.delaparra_services.apps.eupay.service.P2PServiceTest" time="0.0"/>
+  <testcase name="case insensitive IBAN passes" classname="nl.delaparra_services.apps.eupay.service.P2PServiceTest" time="0.0"/>
+  <testcase name="non-EU IBAN rejected" classname="nl.delaparra_services.apps.eupay.service.P2PServiceTest" time="0.001"/>
+  <testcase name="valid Dutch IBAN passes" classname="nl.delaparra_services.apps.eupay.service.P2PServiceTest" time="0.0"/>
+  <testcase name="valid French IBAN passes" classname="nl.delaparra_services.apps.eupay.service.P2PServiceTest" time="0.001"/>
   <testcase name="IBAN too long fails" classname="nl.delaparra_services.apps.eupay.service.P2PServiceTest" time="0.0"/>
-  <testcase name="valid Swedish IBAN passes" classname="nl.delaparra_services.apps.eupay.service.P2PServiceTest" time="0.001"/>
+  <testcase name="valid Swedish IBAN passes" classname="nl.delaparra_services.apps.eupay.service.P2PServiceTest" time="0.0"/>
   <testcase name="EEA countries accepted" classname="nl.delaparra_services.apps.eupay.service.P2PServiceTest" time="0.0"/>
   <testcase name="valid Italian IBAN passes" classname="nl.delaparra_services.apps.eupay.service.P2PServiceTest" time="0.0"/>
   <testcase name="valid Spanish IBAN passes" classname="nl.delaparra_services.apps.eupay.service.P2PServiceTest" time="0.0"/>
-  <testcase name="valid Polish IBAN passes" classname="nl.delaparra_services.apps.eupay.service.P2PServiceTest" time="0.001"/>
+  <testcase name="valid Polish IBAN passes" classname="nl.delaparra_services.apps.eupay.service.P2PServiceTest" time="0.0"/>
   <testcase name="UK IBAN rejected post-Brexit" classname="nl.delaparra_services.apps.eupay.service.P2PServiceTest" time="0.0"/>
-  <testcase name="valid Dutch IBAN with spaces passes" classname="nl.delaparra_services.apps.eupay.service.P2PServiceTest" time="0.0"/>
+  <testcase name="valid Dutch IBAN with spaces passes" classname="nl.delaparra_services.apps.eupay.service.P2PServiceTest" time="0.001"/>
   <testcase name="invalid checksum fails" classname="nl.delaparra_services.apps.eupay.service.P2PServiceTest" time="0.0"/>
   <system-out><![CDATA[]]></system-out>
   <system-err><![CDATA[]]></system-err>

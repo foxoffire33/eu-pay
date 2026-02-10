@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="nl.delaparra_services.apps.eupay.util.UuidV6Test" tests="12" skipped="0" failures="0" errors="0" timestamp="2026-02-10T21:11:06.346Z" hostname="EliteBook-X" time="0.161">
+<testsuite name="nl.delaparra_services.apps.eupay.util.UuidV6Test" tests="12" skipped="0" failures="0" errors="0" timestamp="2026-02-10T22:03:48.737Z" hostname="EliteBook-X" time="0.162">
   <properties/>
-  <testcase name="version nibble is 6" classname="nl.delaparra_services.apps.eupay.util.UuidV6Test" time="0.0"/>
+  <testcase name="version nibble is 6" classname="nl.delaparra_services.apps.eupay.util.UuidV6Test" time="0.001"/>
   <testcase name="isValid returns false for garbage string" classname="nl.delaparra_services.apps.eupay.util.UuidV6Test" time="0.0"/>
   <testcase name="clock sequence handles same-millisecond generation" classname="nl.delaparra_services.apps.eupay.util.UuidV6Test" time="0.001"/>
   <testcase name="generated UUIDs are unique" classname="nl.delaparra_services.apps.eupay.util.UuidV6Test" time="0.004"/>

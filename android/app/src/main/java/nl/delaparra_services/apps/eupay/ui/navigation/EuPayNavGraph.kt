@@ -76,7 +76,7 @@ fun EuPayNavGraph(isLoggedIn: Boolean) {
             startDestination = startDestination,
             modifier = Modifier.padding(innerPadding),
         ) {
-            // Auth
+            // Auth (single screen — auto-registers if no passkey exists)
             composable(Screen.Login.route) {
                 LoginScreen(
                     onLoginSuccess = {
@@ -84,19 +84,6 @@ fun EuPayNavGraph(isLoggedIn: Boolean) {
                             popUpTo(Screen.Login.route) { inclusive = true }
                         }
                     },
-                    onNavigateToRegister = {
-                        navController.navigate(Screen.Register.route)
-                    },
-                )
-            }
-            composable(Screen.Register.route) {
-                RegisterScreen(
-                    onRegisterSuccess = {
-                        navController.navigate(Screen.Home.route) {
-                            popUpTo(0) { inclusive = true }
-                        }
-                    },
-                    onNavigateBack = { navController.popBackStack() },
                 )
             }
 

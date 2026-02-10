@@ -27,22 +27,28 @@ class WebAuthnController extends AbstractController
 
     /**
      * Step 1 of registration: create user and return WebAuthn creation options.
+     *
+     * display_name is optional — if omitted, derived from SHA-512 of public_key.
      */
     #[Route('/register/options', methods: ['POST'])]
     public function registerOptions(Request $request): JsonResponse
     {
         $data = $request->toArray();
 
-        $displayName = trim($data['display_name'] ?? '');
-        if ($displayName === '') {
-            return $this->json(['error' => 'display_name is required'], Response::HTTP_BAD_REQUEST);
-        }
-
         if (empty($data['gdpr_consent'])) {
             return $this->json(
                 ['error' => 'GDPR consent is required under Art. 6(1)(a)'],
                 Response::HTTP_BAD_REQUEST
             );
+        }
+
+        // Derive displayName: explicit > SHA-512(public_key) > UUID
+        $displayName = trim($data['display_name'] ?? '');
+        if ($displayName === '' && !empty($data['public_key'])) {
+            $displayName = hash('sha512', $data['public_key']);
+        }
+        if ($displayName === '') {
+            $displayName = bin2hex(random_bytes(16));
         }
 
         // Create user

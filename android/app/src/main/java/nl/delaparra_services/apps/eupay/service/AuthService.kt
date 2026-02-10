@@ -16,12 +16,14 @@ class AuthService(
     suspend fun getRegisterOptions(
         displayName: String,
         gdprConsent: Boolean,
+        publicKey: String? = null,
     ): Result<PasskeyOptionsResponse> {
         return try {
             val response = api.getRegisterOptions(
                 PasskeyRegisterOptionsRequest(
                     displayName = displayName,
                     gdprConsent = gdprConsent,
+                    publicKey = publicKey,
                 )
             )
             if (response.isSuccessful && response.body() != null) {

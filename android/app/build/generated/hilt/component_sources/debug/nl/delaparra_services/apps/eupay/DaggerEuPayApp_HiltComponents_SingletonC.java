@@ -521,7 +521,7 @@ public final class DaggerEuPayApp_HiltComponents_SingletonC {
       public T get() {
         switch (id) {
           case 0: // nl.delaparra_services.apps.eupay.ui.viewmodel.AuthViewModel
-          return (T) new AuthViewModel(singletonCImpl.provideAuthServiceProvider.get(), singletonCImpl.providePasskeyServiceProvider.get(), singletonCImpl.provideGsonProvider.get());
+          return (T) new AuthViewModel(singletonCImpl.provideAuthServiceProvider.get(), singletonCImpl.providePasskeyServiceProvider.get(), singletonCImpl.provideTokenRepositoryProvider.get(), singletonCImpl.provideGsonProvider.get());
 
           case 1: // nl.delaparra_services.apps.eupay.ui.viewmodel.CardsViewModel
           return (T) new CardsViewModel(singletonCImpl.provideCardServiceProvider.get());

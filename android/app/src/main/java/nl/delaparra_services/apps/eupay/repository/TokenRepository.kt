@@ -11,6 +11,7 @@ class TokenRepository(private val prefs: SharedPreferences) {
     companion object {
         private const val KEY_JWT = "jwt_token"
         private const val KEY_USER_ID = "user_id"
+        private const val KEY_HAS_PASSKEY = "has_passkey"
     }
 
     fun saveToken(token: String) {
@@ -30,4 +31,10 @@ class TokenRepository(private val prefs: SharedPreferences) {
     }
 
     fun isLoggedIn(): Boolean = getToken() != null
+
+    fun setHasPasskey() {
+        prefs.edit().putBoolean(KEY_HAS_PASSKEY, true).apply()
+    }
+
+    fun hasPasskey(): Boolean = prefs.getBoolean(KEY_HAS_PASSKEY, false)
 }

@@ -75,6 +75,7 @@ services:
     ports:
       - "80:80"
       - "443:443"
+      - "8080:8080"   # HTTP-only dev API for Android emulator
     volumes:
       - ./backend/public:/app/public:ro
       - ./docker/certs:/etc/nginx/certs:ro

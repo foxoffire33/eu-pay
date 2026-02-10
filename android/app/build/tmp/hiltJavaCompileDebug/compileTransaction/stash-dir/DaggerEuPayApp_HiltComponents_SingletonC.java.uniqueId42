@@ -689,7 +689,7 @@ public final class DaggerEuPayApp_HiltComponents_SingletonC {
     }
 
     @Override
-    public void injectEuPayApp(EuPayApp arg0) {
+    public void injectEuPayApp(EuPayApp euPayApp) {
     }
 
     private static final class SwitchingProvider<T> implements Provider<T> {

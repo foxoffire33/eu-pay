@@ -10,5 +10,5 @@ public final class BuildConfig {
   public static final int VERSION_CODE = 1;
   public static final String VERSION_NAME = "0.0.1-debug";
   // Field from default config.
-  public static final String API_BASE_URL = "https://api.eupay.dev";
+  public static final String API_BASE_URL = "http://10.0.2.2:8080";
 }
