@@ -302,7 +302,7 @@ class OpenBankingService
                 'error' => $e->getMessage(),
             ]);
 
-            throw new PSD2 bankApiException(
+            throw new \RuntimeException(
                 "Open Banking request failed: {$e->getMessage()}",
                 $e->getCode(),
                 $e

@@ -16,9 +16,9 @@ use Symfony\Component\Uid\Uuid;
  */
 #[ORM\Entity(repositoryClass: P2PTransferRepository::class)]
 #[ORM\Table(name: 'p2p_transfers')]
-#[ORM\Index(columns: ['sender_id', 'created_at'], name: 'idx_p2p_sender_date')]
-#[ORM\Index(columns: ['recipient_id'], name: 'idx_p2p_recipient')]
-#[ORM\Index(columns: ['status'], name: 'idx_p2p_status')]
+#[ORM\Index(fields: ['sender', 'createdAt'], name: 'idx_p2p_sender_date')]
+#[ORM\Index(fields: ['recipient'], name: 'idx_p2p_recipient')]
+#[ORM\Index(fields: ['status'], name: 'idx_p2p_status')]
 class P2PTransfer
 {
     public const STATUS_INITIATED = 'initiated';

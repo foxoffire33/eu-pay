@@ -4,6 +4,8 @@ parameters:
     card_encryption_key: '%env(CARD_ENCRYPTION_KEY)%'
     hce_session_key_ttl: '%env(int:HCE_SESSION_KEY_TTL)%'
     blind_index_key: '%env(BLIND_INDEX_KEY)%'
+    webauthn_rp_id: '%env(WEBAUTHN_RP_ID)%'
+    webauthn_rp_name: '%env(WEBAUTHN_RP_NAME)%'
 
 services:
     _defaults:
@@ -45,6 +47,12 @@ services:
 
     App\Service\Crypto\EnvelopeEncryptionService: ~
 
+    App\Service\WebAuthn\WebAuthnService:
+        arguments:
+            $rpId: '%webauthn_rp_id%'
+            $rpName: '%webauthn_rp_name%'
+            $webauthnChallengeCache: '@webauthn.challenge.cache'
+
     # Card Issuing — 17 EU-licensed providers for Visa/Mastercard NFC tap-to-pay
     # Change the alias below to switch provider (zero code changes needed)
     #
@@ -70,7 +78,7 @@ services:
     # │ Bankable         │ Visa+MC   │ CSSF           │ 🇱🇺 Luxembourg             │
     # └──────────────────┴───────────┴────────────────┴──────────────────────────┘
     App\Service\CardIssuing\CardIssuerInterface:
-        alias: App\Service\CardIssuing\MarqetaCardIssuer
+        alias: App\Service\CardIssuing\StripeCardIssuer
 
     # 🇮🇪 Marqeta Europe Ltd — CBI Ireland, Visa
     App\Service\CardIssuing\MarqetaCardIssuer:
@@ -92,7 +100,8 @@ services:
     # 🇮🇪 Stripe Payments Europe Ltd — CBI Ireland, Visa
     App\Service\CardIssuing\StripeCardIssuer:
         arguments:
-            $secretKey: '%env(STRIPE_ISSUING_SECRET_KEY)%'
+            $apiKey: '%env(STRIPE_ISSUING_SECRET_KEY)%'
+            $baseUrl: 'https://api.stripe.com/v1'
 
     # 🇫🇮 Enfuce Financial Services — FIN-FSA Finland, Visa+Mastercard
     App\Service\CardIssuing\EnfuceCardIssuer:

@@ -28,6 +28,7 @@ services:
       - ./docker/php/php-fpm.d/www.conf:/usr/local/etc/php-fpm.d/zzz-eupay.conf:ro
     environment:
       APP_ENV: dev
+      CORS_ALLOW_ORIGIN: "^https?://(localhost|10\\.0\\.2\\.2|eupay\\.localhost)(:[0-9]+)?$"
       APP_DEBUG: 1
       APP_SECRET: change-me-in-production
       DATABASE_URL: "postgresql://eupay:eupay_secret@postgres:5432/eupay?serverVersion=16&charset=utf8"
@@ -36,18 +37,21 @@ services:
       JWT_PASSPHRASE: eupay-dev-passphrase
       JWT_TOKEN_TTL: 3600
       PSD2_API_BASE_URL: "https://api-sandbox.rabobank.nl"
-      PSD2_CLIENT_ID: "${PSD2_CLIENT_ID:-sandbox-key}"
+      PSD2_CLIENT_ID: "${PSD2_CLIENT_ID:-sandbox-psd2-client}"
+      PSD2_CLIENT_SECRET: "${PSD2_CLIENT_SECRET:-sandbox-psd2-secret}"
       PSD2_PARTNER_ID: "${PSD2_PARTNER_ID:-sandbox-partner}"
       PSD2_WEBHOOK_SECRET: "${PSD2_WEBHOOK_SECRET:-dev-webhook-secret}"
+      PSD2_CERT_PATH: "/app/config/psd2/qwac.pem"
+      PSD2_KEY_PATH: "/app/config/psd2/qwac-key.pem"
       BLIND_INDEX_KEY: "${BLIND_INDEX_KEY:-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef}"
       CARD_ENCRYPTION_KEY: "${CARD_ENCRYPTION_KEY:-abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789}"
       HCE_SESSION_KEY_TTL: 300
-      PSD2_CLIENT_ID: "${PSD2_CLIENT_ID:-sandbox-psd2-client}"
-      PSD2_CLIENT_SECRET: "${PSD2_CLIENT_SECRET:-sandbox-psd2-secret}"
-      PSD2_CERT_PATH: "/app/config/psd2/qwac.pem"
-      PSD2_KEY_PATH: "/app/config/psd2/qwac-key.pem"
-      PSD2_API_BASE_URL: "https://api-sandbox.rabobank.nl"
+      WEBAUTHN_RP_ID: "eupay.localhost"
+      WEBAUTHN_RP_NAME: "EU Pay"
       APP_CALLBACK_URL: "https://eupay.localhost"
+      # Stripe Issuing (default card issuer — Visa, CBI Ireland)
+      STRIPE_ISSUING_SECRET_KEY: "${STRIPE_ISSUING_SECRET_KEY:-sk_test_placeholder}"
+      # Marqeta (alternative card issuer)
       CARD_ISSUER_API_URL: "https://sandbox-api.marqeta.com"
       CARD_ISSUER_APP_TOKEN: "${CARD_ISSUER_APP_TOKEN:-sandbox-app-token}"
       CARD_ISSUER_ADMIN_TOKEN: "${CARD_ISSUER_ADMIN_TOKEN:-sandbox-admin-token}"
@@ -114,6 +118,18 @@ services:
       interval: 5s
       timeout: 3s
       retries: 5
+    networks:
+      - eupay
+
+  # ── Landing Page (React + Vite + Mantine) ────────────
+  landing-page:
+    build:
+      context: .
+      dockerfile: docker/landing-page/Dockerfile
+    container_name: eupay-landing
+    restart: unless-stopped
+    ports:
+      - "3000:80"
     networks:
       - eupay
 

@@ -19,3 +19,14 @@ spec:
   selector:
     matchLabels:
       app: eupay-nginx
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: eupay-landing-pdb
+  namespace: eupay
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: eupay-landing

@@ -45,6 +45,25 @@ patches:
         path: /spec/maxReplicas
         value: 2
 
+  # ── Landing page: scale down for staging ──
+  - target:
+      kind: Deployment
+      name: eupay-landing
+    patch: |
+      - op: replace
+        path: /spec/replicas
+        value: 1
+  - target:
+      kind: HorizontalPodAutoscaler
+      name: eupay-landing-hpa
+    patch: |
+      - op: replace
+        path: /spec/minReplicas
+        value: 1
+      - op: replace
+        path: /spec/maxReplicas
+        value: 2
+
   # ── Staging ingress: different host + staging LE issuer ──
   - target:
       kind: Ingress
@@ -55,16 +74,22 @@ patches:
         value: letsencrypt-staging
       - op: replace
         path: /metadata/annotations/cert-manager.io~1common-name
-        value: staging-api.eupay.eu
+        value: staging.eu-pay.nl
       - op: replace
         path: /spec/tls/0/hosts/0
-        value: staging-api.eupay.eu
+        value: staging.eu-pay.nl
+      - op: replace
+        path: /spec/tls/0/hosts/1
+        value: staging-api.eu-pay.nl
       - op: replace
         path: /spec/tls/0/secretName
         value: eupay-staging-tls
       - op: replace
         path: /spec/rules/0/host
-        value: staging-api.eupay.eu
+        value: staging.eu-pay.nl
+      - op: replace
+        path: /spec/rules/1/host
+        value: staging-api.eu-pay.nl
 
   # ── Smaller PostgreSQL PVC for staging ──
   - target:

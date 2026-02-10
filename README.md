@@ -76,8 +76,9 @@ Add to `/etc/hosts`:
 **Key design decisions:**
 
 - **No Google Pay / Apple Pay dependency.** Direct HCE with EMV contactless flow — the app *is* the payment terminal interface.
+- **WebAuthn / FIDO2 passkeys.** No passwords. Authentication via platform biometrics (fingerprint, face) or physical security keys (USB/NFC like YubiKey). Discoverable credentials — no username required at login.
 - **Zero-knowledge encryption.** RSA-4096 OAEP + AES-256-GCM envelope encryption. Backend stores only encrypted blobs + public keys. Client decrypts locally with private key in Android Keystore.
-- **Blind indexes.** HMAC-SHA256 over normalized inputs enables login and search without revealing plaintext to the server.
+- **Blind indexes.** HMAC-SHA256 over normalized inputs enables search without revealing plaintext to the server.
 - **EU-only, by design.** GDPR Art. 6/7/13/14/15/17/20, ePrivacy Directive Art. 5(3), PSD2 SCA, Consumer Rights Directive, AML 5-year retention, German TMG/HGB requirements.
 - **UUIDv6** for all primary keys (time-sortable, no sequential leaks).
 
@@ -90,7 +91,9 @@ Add to `/etc/hosts`:
 | Backend framework | Symfony | 8.0 |
 | Backend language | PHP | ≥ 8.4 |
 | ORM | Doctrine ORM / DBAL | 3.3 / 4.2 |
-| Auth | LexikJWT (RS256) | 3.1 |
+| Auth (backend) | WebAuthn / FIDO2 Passkeys | web-auth/webauthn-lib 5.3 |
+| Auth (Android) | Credential Manager | androidx.credentials 1.5.0 |
+| JWT | LexikJWT (RS256) | 3.1 |
 | Tests (backend) | PHPUnit | 11.5 |
 | Android language | Kotlin | 2.1.21 |
 | UI toolkit | Jetpack Compose | BOM 2026.01.01 |
@@ -99,6 +102,7 @@ Add to `/etc/hosts`:
 | Android min | API 26 | Android 8.0 |
 | Build system | Gradle + AGP | 8.11.1 / 8.10.1 |
 | Networking | Retrofit 2 + OkHttp 4 | 2.11 / 4.12 |
+| Landing page | React + Vite + Mantine 8 | React 19, Vite 6, @mantine/core 8.3 |
 | CI/CD | GitHub Actions | JDK 21, PHP 8.4 |
 | Database | PostgreSQL | 16 |
 | Cache | Redis | 7 |
@@ -106,7 +110,7 @@ Add to `/etc/hosts`:
 | HTTPS (local) | mkcert | latest |
 | Containers | Docker Compose | v2 |
 | Banking (accounts) | PSD2 Open Banking | AISP/PISP (all EU/EEA banks) |
-| Card issuing | Marqeta Europe Ltd | Visa debit cards + NFC tokenization |
+| Card issuing | Stripe Issuing (default) | Visa debit cards + custom HCE NFC |
 
 ---
 
@@ -116,6 +120,7 @@ Add to `/etc/hosts`:
 |---------|-------|------|-------------|
 | `php` | PHP 8.4 FPM Alpine | 9000 (internal) | Symfony app with OPcache + JIT |
 | `nginx` | Nginx 1.27 Alpine | 80 → 443 (HTTPS) | Reverse proxy, TLS termination |
+| `landing-page` | Nginx 1.27 Alpine | 3000 | React landing page (Vite + Mantine 8) |
 | `postgres` | PostgreSQL 16 Alpine | 5432 | Primary database |
 | `redis` | Redis 7 Alpine | 6379 | Sessions, rate limiter, messenger |
 
@@ -135,6 +140,9 @@ Add to `/etc/hosts`:
 | `make migrate` | Run Doctrine migrations |
 | `make jwt-keys` | Generate RS256 JWT keypair |
 | `make logs` | Tail logs (all services) |
+| `make landing-install` | Install landing page dependencies |
+| `make landing-dev` | Start landing page dev server (Vite HMR) |
+| `make landing-build` | Build landing page for production |
 | `make clean` | Stop + remove volumes |
 
 ---
@@ -147,6 +155,19 @@ eu-pay/
 ├── Makefile                             # Developer commands
 ├── LICENSE                              # MIT
 │
+├── landing-page/                        # Marketing site (React + Vite + Mantine 8)
+│   ├── package.json                     # @mantine/core ^8.3, React 19, Vite 6
+│   ├── vite.config.ts                   # Vite build config
+│   ├── postcss.config.cjs              # Mantine PostCSS preset
+│   ├── index.html                       # Entry point with OG meta
+│   └── src/
+│       ├── main.tsx                     # MantineProvider bootstrap
+│       ├── App.tsx                      # Section composition
+│       ├── theme.ts                     # EU blue/indigo palette
+│       ├── components/                  # Layout, Header, Footer
+│       ├── sections/                    # Hero, Features, HowItWorks, Security, Banks, CTA
+│       └── data/                        # Static bank + feature data
+│
 ├── docker/
 │   ├── php/
 │   │   ├── Dockerfile                   # PHP 8.4 FPM + OPcache JIT + Composer
@@ -154,6 +175,9 @@ eu-pay/
 │   ├── nginx/
 │   │   ├── Dockerfile                   # Nginx 1.27
 │   │   └── eupay.conf                   # HTTPS, TLS 1.2/1.3, security headers
+│   ├── landing-page/
+│   │   ├── Dockerfile                   # Multi-stage: Node build → Nginx serve
+│   │   └── landing-page.conf            # SPA nginx config
 │   └── certs/
 │       └── .gitkeep                     # mkcert certs generated here
 │
@@ -168,7 +192,8 @@ eu-pay/
 │   │   ├── services.yaml                # DI wiring, env bindings
 │   │   └── packages/
 │   │       ├── framework.yaml           # UUIDv6, rate limiting, serializer
-│   │       ├── security.yaml            # JWT firewall, access control
+│   │       ├── security.yaml            # Passkey + JWT firewall, access control
+│   │       ├── cache.yaml               # WebAuthn challenge cache (120s TTL)
 │   │       ├── doctrine.yaml            # ORM, PostgreSQL, test SQLite
 │   │       ├── doctrine_migrations.yaml
 │   │       ├── lexik_jwt.yaml           # RS256 JWT config
@@ -176,7 +201,8 @@ eu-pay/
 │   ├── src/
 │   │   ├── Kernel.php                   # Symfony MicroKernel
 │   │   ├── Controller/
-│   │   │   ├── AuthController.php       # Register, login, key rotation
+│   │   │   ├── AuthController.php       # Profile, key rotation
+│   │   │   ├── WebAuthnController.php   # Passkey registration + login (4 endpoints)
 │   │   │   ├── AccountController.php    # PSD2 account, balance, transactions
 │   │   │   ├── CardController.php       # Virtual card CRUD, activate/block
 │   │   │   ├── HceController.php        # HCE token provisioning + payloads
@@ -184,15 +210,19 @@ eu-pay/
 │   │   │   └── WebhookController.php    # Webhook receiver
 │   │   ├── Entity/
 │   │   │   ├── User.php                 # Encrypted PII, blind indexes, public key
+│   │   │   ├── WebAuthnCredential.php   # FIDO2 passkey credentials
 │   │   │   ├── Card.php                 # PSD2 card reference
 │   │   │   ├── HceToken.php             # NFC session tokens
 │   │   │   └── Transaction.php          # Encrypted merchant data
 │   │   ├── Repository/
 │   │   │   ├── UserRepository.php
+│   │   │   ├── WebAuthnCredentialRepository.php
 │   │   │   ├── CardRepository.php
 │   │   │   ├── HceTokenRepository.php
 │   │   │   └── TransactionRepository.php
 │   │   └── Service/
+│   │       ├── WebAuthn/
+│   │       │   └── WebAuthnService.php    # Passkey registration + login verification
 │   │       ├── OpenBankingService.php     # PSD2 AISP/PISP (accounts, payments)
 │   │       ├── CardIssuing/
 │   │       │   ├── CardIssuerInterface.php  # Abstraction for any EU card issuer
@@ -237,7 +267,7 @@ eu-pay/
 │   │   └── src/
 │   │       ├── main/
 │   │       │   ├── AndroidManifest.xml
-│   │       │   ├── java/com/example/eupay/
+│   │       │   ├── java/nl/delaparra_services/apps/eupay/
 │   │       │   │   ├── EuPayApp.kt              # @HiltAndroidApp
 │   │       │   │   ├── api/
 │   │       │   │   │   ├── EuPayApi.kt          # Retrofit interface
@@ -253,6 +283,7 @@ eu-pay/
 │   │       │   │   ├── repository/TokenRepository.kt
 │   │       │   │   ├── service/
 │   │       │   │   │   ├── AuthService.kt
+│   │       │   │   │   ├── PasskeyService.kt  # Credential Manager passkey ops
 │   │       │   │   │   ├── CardService.kt
 │   │       │   │   │   └── PaymentService.kt
 │   │       │   │   └── util/
@@ -263,7 +294,7 @@ eu-pay/
 │   │       │       └── xml/
 │   │       │           ├── hce_payment_aid.xml
 │   │       │           └── network_security_config.xml
-│   │       ├── test/java/com/example/eupay/
+│   │       ├── test/java/nl/delaparra_services/apps/eupay/
 │   │       │   ├── hce/
 │   │       │   │   ├── EmvUtilTest.kt
 │   │       │   │   └── HcePaymentDataHolderTest.kt
@@ -274,7 +305,7 @@ eu-pay/
 │   │       │   └── util/
 │   │       │       ├── DeviceFingerprintTest.kt
 │   │       │       └── UuidV6Test.kt
-│   │       └── androidTest/java/com/example/eupay/hce/
+│   │       └── androidTest/java/nl/delaparra_services/apps/eupay/hce/
 │   │           └── DeviceFingerprintInstrumentedTest.kt
 │
 ├── docs/
@@ -313,11 +344,14 @@ eu-pay/
 
 ## API Endpoints
 
-### Authentication (`/api`)
+### Authentication — WebAuthn Passkeys (`/api/passkey`)
 
 | Method | Path | Description |
 |--------|------|-------------|
-| `POST` | `/api/register` | Register with GDPR consent + RSA-4096 public key |
+| `POST` | `/api/passkey/register/options` | Get WebAuthn creation options (creates user) |
+| `POST` | `/api/passkey/register` | Verify attestation, store credential, return JWT |
+| `POST` | `/api/passkey/login/options` | Get WebAuthn request options (discoverable) |
+| `POST` | `/api/passkey/login` | Verify assertion, return JWT |
 | `GET` | `/api/me` | Get profile (encrypted fields) |
 | `POST` | `/api/me/rotate-key` | Rotate encryption key pair |
 
@@ -435,7 +469,7 @@ EU Pay uses **two separate banking integrations** — this is critical:
 │  ● SELECT PPSE → responds with Visa AID                         │
 │  ● GET PROCESSING OPTIONS → returns DPAN + EMV data             │
 │  ● GENERATE AC → computes ARQC using session keys               │
-│  ● POS terminal → acquirer → Visa → Marqeta → approved ✓       │
+│  ● POS terminal → acquirer → Visa → Stripe Issuing → approved ✓│
 └──────────────────────────────────────────────────────────────────┘
 ```
 
@@ -491,7 +525,7 @@ The backend never stores or processes plaintext personal data.
 2. For every PII field (email, name, phone, IBAN), the backend generates a random AES-256-GCM data encryption key (DEK), encrypts the field with it, then encrypts the DEK with the user's RSA public key.
 3. The encrypted blob (encrypted DEK + IV + ciphertext + GCM tag) is stored. No plaintext ever hits disk.
 4. For searchable fields (email, phone, IBAN), a blind index (HMAC-SHA256 with a server-side key over normalized input) is computed and stored alongside the encrypted blob.
-5. Login: client sends email → backend computes blind index → looks up user → returns JWT. Email plaintext is never persisted.
+5. Login: WebAuthn passkey challenge-response — no email/password sent. Backend verifies FIDO2 assertion against stored credential public key → returns JWT.
 6. GDPR export: returns encrypted blobs. Client decrypts locally.
 7. Key rotation: client decrypts all fields with old key, re-encrypts with new public key, POSTs to `/api/me/rotate-key`.
 
@@ -512,7 +546,7 @@ Full regulatory matrix in `docs/EU_COMPLIANCE.md`. Summary:
 | GDPR Art. 17 (erasure) | ✅ | `/api/gdpr/erase` with AML carve-out |
 | GDPR Art. 20 (portability) | ✅ | JSON export of encrypted fields |
 | ePrivacy Art. 5(3) | ✅ | No tracking cookies/fingerprints |
-| PSD2 SCA | ✅ | Biometric + device binding |
+| PSD2 SCA | ✅ | WebAuthn passkeys (biometric + device binding) |
 | Consumer Rights Directive | ✅ | 14-day withdrawal info endpoint |
 | AML (5AMLD) | ✅ | 5-year transaction retention |
 | German TMG §5 | ✅ | `/api/legal/imprint` |
@@ -586,6 +620,8 @@ cd android
 | `JWT_PUBLIC_KEY` | Path to RS256 public key | `config/jwt/public.pem` |
 | `JWT_PASSPHRASE` | JWT key passphrase | — |
 | `JWT_TOKEN_TTL` | Token lifetime in seconds | `3600` |
+| `WEBAUTHN_RP_ID` | WebAuthn relying party ID | `eupay.localhost` |
+| `WEBAUTHN_RP_NAME` | WebAuthn relying party display name | `EU Pay` |
 | `PSD2_API_BASE_URL` | PSD2 API endpoint | sandbox URL |
 | `PSD2_CLIENT_ID` | PSD2 client ID | — |
 | `PSD2_PARTNER_ID` | PSD2 partner ID | — |
@@ -759,10 +795,10 @@ git push origin v1.0.1
 |------|----------|
 | `EmvUtilTest` | TLV encoding, APDU commands |
 | `HcePaymentDataHolderTest` | Payment state singleton |
-| `AuthServiceTest` | Registration with public key, zero-knowledge models |
+| `AuthServiceTest` | Passkey registration + login flow, JWT token handling |
 | `PaymentServiceTest` | Payment flow |
 | `P2PServiceTest` | IBAN validation (EU/EEA countries), checksum, format |
-| `EuComplianceAndroidTest` | GDPR consent fields, public key in requests |
+| `EuComplianceAndroidTest` | GDPR consent in passkey registration, consent models |
 | `DeviceFingerprintTest` | Device binding |
 | `UuidV6Test` | Time-sortable UUID generation |
 | `DeviceFingerprintInstrumentedTest` | Hardware fingerprint (instrumented) |
@@ -773,7 +809,7 @@ git push origin v1.0.1
 
 - **Encryption at rest:** All PII envelope-encrypted (RSA-4096 + AES-256-GCM). Backend stores only ciphertext.
 - **Encryption in transit:** TLS 1.2/1.3 enforced. HSTS enabled. Certificate pinning in Android.
-- **Authentication:** RS256 JWT with configurable TTL. Rate-limited login (5/min).
+- **Authentication:** WebAuthn / FIDO2 passkeys — platform biometrics (fingerprint, face) and physical security keys (USB/NFC YubiKey). RS256 JWT with configurable TTL. No passwords stored.
 - **Webhook verification:** HMAC-SHA256 signature on all bank webhooks.
 - **Android:** Private keys in hardware-backed Keystore (non-exportable). Biometric gating.
 - **Headers:** `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`, `Strict-Transport-Security`.
@@ -793,14 +829,14 @@ Switch provider with **one line** in `services.yaml` — zero code changes:
 
 ```yaml
 App\Service\CardIssuing\CardIssuerInterface:
-    alias: App\Service\CardIssuing\MarqetaCardIssuer    # ← change this
+    alias: App\Service\CardIssuing\StripeCardIssuer    # ← change this
 ```
 
 | Provider | Scheme | License | Country | Coverage | Powers |
 |----------|--------|---------|---------|----------|--------|
-| **Marqeta** (default) | Visa | Central Bank of Ireland | IE | 40+ countries | Curve, Wise, Monese |
+| **Stripe Issuing** (default) | Visa | Central Bank of Ireland | IE | 20 EU countries | Ramp, Brex, Expensify |
+| **Marqeta** | Visa | Central Bank of Ireland | IE | 40+ countries | Curve, Wise, Monese |
 | **Adyen Issuing** | Visa+MC | De Nederlandsche Bank | NL | 30+ EU/EEA | eBay, Klarna, H&M |
-| **Stripe Issuing** | Visa | Central Bank of Ireland | IE | 20 EU countries | Ramp, Brex, Expensify |
 | **Enfuce** | Visa+MC | Finnish FSA (EMI) | FI | 30 EEA + UK | Porsche Card, SEB, Pleo |
 | **Wallester** | Visa | Estonian FSA | EE | 30 EEA + UK | Free tier (300 cards) |
 | **Paynetics** | Visa+MC | Bulgarian National Bank | BG | All EEA | phyre, iCard, Phos |

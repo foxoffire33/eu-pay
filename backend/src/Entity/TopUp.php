@@ -16,8 +16,8 @@ use Symfony\Component\Uid\Uuid;
  */
 #[ORM\Entity(repositoryClass: TopUpRepository::class)]
 #[ORM\Table(name: 'top_ups')]
-#[ORM\Index(columns: ['user_id', 'status'], name: 'idx_topup_user_status')]
-#[ORM\Index(columns: ['external_payment_id'], name: 'idx_topup_external_id')]
+#[ORM\Index(fields: ['user', 'status'], name: 'idx_topup_user_status')]
+#[ORM\Index(fields: ['externalPaymentId'], name: 'idx_topup_external_id')]
 class TopUp
 {
     public const STATUS_INITIATED = 'initiated';     // Created, awaiting SCA

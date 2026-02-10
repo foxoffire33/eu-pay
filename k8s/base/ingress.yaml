@@ -8,7 +8,7 @@ metadata:
   annotations:
     # ── cert-manager: auto-provision Let's Encrypt TLS ──
     cert-manager.io/cluster-issuer: letsencrypt-prod
-    cert-manager.io/common-name: api.eupay.eu
+    cert-manager.io/common-name: eu-pay.nl
 
     # ── Nginx ingress controller ──
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
@@ -33,10 +33,21 @@ spec:
   ingressClassName: nginx
   tls:
     - hosts:
-        - api.eupay.eu
+        - eu-pay.nl
+        - api.eu-pay.nl
       secretName: eupay-tls
   rules:
-    - host: api.eupay.eu
+    - host: eu-pay.nl
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: eupay-landing
+                port:
+                  number: 80
+    - host: api.eu-pay.nl
       http:
         paths:
           - path: /

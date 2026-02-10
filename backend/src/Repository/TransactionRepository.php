@@ -31,7 +31,7 @@ class TransactionRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-    public function findByPSD2 bankTransactionId(string $txId): ?Transaction
+    public function findByPSD2BankTransactionId(string $txId): ?Transaction
     {
         return $this->findOneBy(['externalTransactionId' => $txId]);
     }

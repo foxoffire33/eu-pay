@@ -45,6 +45,32 @@ patches:
         path: /spec/maxReplicas
         value: 12
 
+  # ── Landing page: production replicas ──
+  - target:
+      kind: Deployment
+      name: eupay-landing
+    patch: |
+      - op: replace
+        path: /spec/replicas
+        value: 3
+  - target:
+      kind: HorizontalPodAutoscaler
+      name: eupay-landing-hpa
+    patch: |
+      - op: replace
+        path: /spec/minReplicas
+        value: 2
+      - op: replace
+        path: /spec/maxReplicas
+        value: 8
+  - target:
+      kind: PodDisruptionBudget
+      name: eupay-landing-pdb
+    patch: |
+      - op: replace
+        path: /spec/minAvailable
+        value: 2
+
   # ── Production ingress: real domain + prod LE issuer ──
   - target:
       kind: Ingress
@@ -55,16 +81,22 @@ patches:
         value: letsencrypt-prod
       - op: replace
         path: /metadata/annotations/cert-manager.io~1common-name
-        value: api.eupay.eu
+        value: eu-pay.nl
       - op: replace
         path: /spec/tls/0/hosts/0
-        value: api.eupay.eu
+        value: eu-pay.nl
+      - op: replace
+        path: /spec/tls/0/hosts/1
+        value: api.eu-pay.nl
       - op: replace
         path: /spec/tls/0/secretName
         value: eupay-prod-tls
       - op: replace
         path: /spec/rules/0/host
-        value: api.eupay.eu
+        value: eu-pay.nl
+      - op: replace
+        path: /spec/rules/1/host
+        value: api.eu-pay.nl
 
   # ── Larger PostgreSQL PVC for production ──
   - target:

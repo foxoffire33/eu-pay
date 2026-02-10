@@ -9,21 +9,20 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Uid\UuidV6;
 
 /**
- * User entity with zero-knowledge encryption.
+ * User entity with zero-knowledge encryption and WebAuthn passkey authentication.
+ *
+ * Authentication is handled exclusively via WebAuthn passkeys (platform or
+ * cross-platform/USB/NFC). No email or password is required.
  *
  * ENCRYPTED (only the user's Android device can read):
  *   email, firstName, lastName, phoneNumber, iban
  *
- * BLIND-INDEXED (backend can match, not read):
- *   emailIndex (HMAC of email — used for login lookup)
- *
  * PLAINTEXT (operational data, not PII):
- *   password (already hashed), externalPersonId, externalAccountId,
+ *   displayName, externalPersonId, externalAccountId,
  *   kycStatus, roles, consent flags, timestamps
  *
  * The user's RSA-4096 public key is stored in publicKey.
@@ -31,31 +30,35 @@ use Symfony\Component\Uid\UuidV6;
  */
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: 'app_user')]
-#[ORM\Index(name: 'idx_email_blind', columns: ['email_index'])]
 #[ORM\HasLifecycleCallbacks]
-class User implements UserInterface, PasswordAuthenticatedUserInterface
+class User implements UserInterface
 {
     #[ORM\Id]
     #[ORM\Column(type: 'uuid', unique: true)]
     private UuidV6 $id;
 
+    // ── Display name (required for passkey registration) ──
+
+    #[ORM\Column(length: 100)]
+    private string $displayName = '';
+
     // ── Encrypted PII (opaque blobs — backend cannot read) ──
 
     /** Envelope-encrypted email (RSA-OAEP + AES-256-GCM) */
-    #[ORM\Column(type: Types::TEXT)]
-    private string $encryptedEmail = '';
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $encryptedEmail = null;
 
-    /** HMAC-SHA256 blind index of normalized email — for login/search */
-    #[ORM\Column(length: 64, unique: true)]
-    private string $emailIndex = '';
+    /** HMAC-SHA256 blind index of normalized email — optional legacy */
+    #[ORM\Column(length: 64, unique: true, nullable: true)]
+    private ?string $emailIndex = null;
 
     /** Envelope-encrypted first name */
-    #[ORM\Column(type: Types::TEXT)]
-    private string $encryptedFirstName = '';
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $encryptedFirstName = null;
 
     /** Envelope-encrypted last name */
-    #[ORM\Column(type: Types::TEXT)]
-    private string $encryptedLastName = '';
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $encryptedLastName = null;
 
     /** Envelope-encrypted phone number */
     #[ORM\Column(type: Types::TEXT, nullable: true)]
@@ -77,9 +80,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     // ── Plaintext operational fields ──
 
-    /** Argon2id hash — already one-way, needed for auth */
-    #[ORM\Column]
-    private string $password = '';
+    /** Legacy password field — nullable, no longer used for auth */
+    #[ORM\Column(nullable: true)]
+    private ?string $password = null;
 
     #[ORM\Column(type: Types::JSON)]
     private array $roles = [];
@@ -133,6 +136,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: HceToken::class, mappedBy: 'user', cascade: ['persist'])]
     private Collection $hceTokens;
 
+    /** @var Collection<int, WebAuthnCredential> */
+    #[ORM\OneToMany(targetEntity: WebAuthnCredential::class, mappedBy: 'user', cascade: ['persist', 'remove'])]
+    private Collection $webAuthnCredentials;
+
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
     private \DateTimeImmutable $createdAt;
 
@@ -144,6 +151,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->id = new UuidV6();
         $this->cards = new ArrayCollection();
         $this->hceTokens = new ArrayCollection();
+        $this->webAuthnCredentials = new ArrayCollection();
         $this->createdAt = new \DateTimeImmutable();
         $this->updatedAt = new \DateTimeImmutable();
     }
@@ -159,27 +167,32 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function getId(): UuidV6 { return $this->id; }
 
     /**
-     * Symfony UserInterface requires a user identifier for auth.
-     * We use the blind index of the email — the backend never sees the real email.
+     * Symfony UserInterface — returns UUID as user identifier.
+     * Passkey auth identifies users by credential, not email.
      */
     public function getUserIdentifier(): string
     {
-        return $this->emailIndex;
+        return $this->id->toRfc4122();
     }
+
+    // ── Display Name ──
+
+    public function getDisplayName(): string { return $this->displayName; }
+    public function setDisplayName(string $v): static { $this->displayName = $v; return $this; }
 
     // ── Encrypted PII accessors ──
 
-    public function getEncryptedEmail(): string { return $this->encryptedEmail; }
-    public function setEncryptedEmail(string $v): static { $this->encryptedEmail = $v; return $this; }
+    public function getEncryptedEmail(): ?string { return $this->encryptedEmail; }
+    public function setEncryptedEmail(?string $v): static { $this->encryptedEmail = $v; return $this; }
 
-    public function getEmailIndex(): string { return $this->emailIndex; }
-    public function setEmailIndex(string $v): static { $this->emailIndex = $v; return $this; }
+    public function getEmailIndex(): ?string { return $this->emailIndex; }
+    public function setEmailIndex(?string $v): static { $this->emailIndex = $v; return $this; }
 
-    public function getEncryptedFirstName(): string { return $this->encryptedFirstName; }
-    public function setEncryptedFirstName(string $v): static { $this->encryptedFirstName = $v; return $this; }
+    public function getEncryptedFirstName(): ?string { return $this->encryptedFirstName; }
+    public function setEncryptedFirstName(?string $v): static { $this->encryptedFirstName = $v; return $this; }
 
-    public function getEncryptedLastName(): string { return $this->encryptedLastName; }
-    public function setEncryptedLastName(string $v): static { $this->encryptedLastName = $v; return $this; }
+    public function getEncryptedLastName(): ?string { return $this->encryptedLastName; }
+    public function setEncryptedLastName(?string $v): static { $this->encryptedLastName = $v; return $this; }
 
     public function getEncryptedPhoneNumber(): ?string { return $this->encryptedPhoneNumber; }
     public function setEncryptedPhoneNumber(?string $v): static { $this->encryptedPhoneNumber = $v; return $this; }
@@ -199,8 +212,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     // ── Auth ──
 
-    public function getPassword(): string { return $this->password; }
-    public function setPassword(string $password): static { $this->password = $password; return $this; }
+    public function getPassword(): ?string { return $this->password; }
+    public function setPassword(?string $password): static { $this->password = $password; return $this; }
 
     public function getRoles(): array
     {
@@ -259,15 +272,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function anonymize(): void
     {
-        $this->encryptedEmail = '';
-        $this->emailIndex = 'anon_' . bin2hex(random_bytes(16));
-        $this->encryptedFirstName = '';
-        $this->encryptedLastName = '';
+        $this->encryptedEmail = null;
+        $this->emailIndex = null;
+        $this->encryptedFirstName = null;
+        $this->encryptedLastName = null;
         $this->encryptedPhoneNumber = null;
         $this->encryptedIban = null;
         $this->publicKey = null;
         $this->publicKeyFingerprint = null;
-        $this->password = '';
+        $this->password = null;
+        $this->displayName = 'Deleted User';
         $this->roles = [];
         $this->anonymized = true;
         $this->anonymizedAt = new \DateTimeImmutable();
@@ -282,6 +296,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     /** @return Collection<int, HceToken> */
     public function getHceTokens(): Collection { return $this->hceTokens; }
+
+    /** @return Collection<int, WebAuthnCredential> */
+    public function getWebAuthnCredentials(): Collection { return $this->webAuthnCredentials; }
 
     public function getCreatedAt(): \DateTimeImmutable { return $this->createdAt; }
     public function getUpdatedAt(): \DateTimeImmutable { return $this->updatedAt; }

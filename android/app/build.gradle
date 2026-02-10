@@ -9,8 +9,13 @@ plugins {
 // Derive version from git tag (v1.2.3 → versionName "1.2.3", versionCode 10203)
 def gitTag = project.findProperty('VERSION_NAME') ?: {
     try {
-        def tag = 'git describe --tags --abbrev=0'.execute().text.trim()
-        tag.startsWith('v') ? tag.substring(1) : tag
+        def result = providers.exec {
+            commandLine 'git', 'describe', '--tags', '--abbrev=0'
+            isIgnoreExitValue = true
+        }
+        def output = result.standardOutput.asText.get().trim()
+        if (output.isEmpty()) return '0.0.1'
+        output.startsWith('v') ? output.substring(1) : output
     } catch (ignored) {
         '0.0.1'
     }
@@ -25,11 +30,11 @@ def computeVersionCode = { String version ->
 }
 
 android {
-    namespace 'com.example.eupay'
+    namespace 'nl.delaparra_services.apps.eupay'
     compileSdk 35   // Android 15
 
     defaultConfig {
-        applicationId "nl.delaparra-services.apps.eupay"
+        applicationId "nl.delaparra_services.apps.eupay"
         minSdk 26       // Android 8.0 — minimum for HCE + modern crypto APIs
         targetSdk 35    // Android 15
         versionCode computeVersionCode(gitTag)
@@ -95,6 +100,7 @@ dependencies {
     implementation platform('androidx.compose:compose-bom:2026.01.01')
     implementation 'androidx.compose.ui:ui'
     implementation 'androidx.compose.material3:material3'
+    implementation 'androidx.compose.material:material-icons-extended'
     implementation 'androidx.compose.ui:ui-tooling-preview'
     implementation 'androidx.activity:activity-compose:1.10.1'
     implementation 'androidx.navigation:navigation-compose:2.8.5'
@@ -113,6 +119,10 @@ dependencies {
     // ── Security ────────────────────────────────────
     implementation 'androidx.security:security-crypto:1.1.0-alpha06'
     implementation 'androidx.biometric:biometric:1.2.0-alpha05'
+
+    // ── WebAuthn Passkeys (Credential Manager) ───
+    implementation 'androidx.credentials:credentials:1.5.0'
+    implementation 'androidx.credentials:credentials-play-services-auth:1.5.0'
 
     // ── DataStore ───────────────────────────────────
     implementation 'androidx.datastore:datastore-preferences:1.1.1'

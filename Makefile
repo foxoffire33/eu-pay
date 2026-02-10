@@ -110,6 +110,17 @@ setup: certs build up install jwt-keys migrate ## Full first-time setup
 	@echo "  🧪 make test"
 	@echo "═══════════════════════════════════════════"
 
+# ── Landing Page ───────────────────────────────────────
+
+landing-install: ## Install landing page dependencies
+	cd landing-page && npm ci
+
+landing-dev: ## Start landing page dev server (Vite HMR)
+	cd landing-page && npm run dev
+
+landing-build: ## Build landing page for production
+	cd landing-page && npm run build
+
 # ── Cleanup ──────────────────────────────────────────────
 
 clean: down ## Stop containers + remove volumes

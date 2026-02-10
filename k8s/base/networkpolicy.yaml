@@ -28,6 +28,25 @@ spec:
         - port: 80
           protocol: TCP
 ---
+# ── Landing page: allow from ingress controller ─────
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-landing-ingress
+  namespace: eupay
+spec:
+  podSelector:
+    matchLabels:
+      app: eupay-landing
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: ingress-nginx
+      ports:
+        - port: 80
+          protocol: TCP
+---
 # ── PHP-FPM: allow only from Nginx ──────────────────
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
