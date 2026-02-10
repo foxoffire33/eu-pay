@@ -57,7 +57,7 @@ class CardServiceTest extends TestCase
         $card = $this->service->createVirtualCard($user, 'Jan de Vries');
 
         $this->assertSame('marqeta-card-abc', $card->getExternalCardId());
-        $this->assertSame('1234', $card->getLast4());
+        $this->assertSame('1234', $card->getLastFourDigits());
         $this->assertSame('VISA', $card->getScheme());
         $this->assertSame('ACTIVE', $card->getStatus());
         $this->assertSame('VIRTUAL', $card->getType());

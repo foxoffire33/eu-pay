@@ -31,7 +31,7 @@ class CardRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-    public function findByPSD2BankCardId(string $cardId): ?Card
+    public function findByExternalCardId(string $cardId): ?Card
     {
         return $this->findOneBy(['externalCardId' => $cardId]);
     }

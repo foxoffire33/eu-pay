@@ -273,7 +273,7 @@ class User implements UserInterface
     public function anonymize(): void
     {
         $this->encryptedEmail = null;
-        $this->emailIndex = null;
+        $this->emailIndex = 'anon_' . bin2hex(random_bytes(16));
         $this->encryptedFirstName = null;
         $this->encryptedLastName = null;
         $this->encryptedPhoneNumber = null;

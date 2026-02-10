@@ -21,7 +21,7 @@ class CardTest extends TestCase
     {
         $card = new Card();
         $this->assertEquals('VIRTUAL', $card->getType());
-        $this->assertEquals('PROCESSING', $card->getStatus());
+        $this->assertEquals('INACTIVE', $card->getStatus());
         $this->assertEquals('VISA', $card->getScheme());
         $this->assertNull($card->getLastFourDigits());
         $this->assertNull($card->getExpiryDate());

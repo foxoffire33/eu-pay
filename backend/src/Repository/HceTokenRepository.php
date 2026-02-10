@@ -47,6 +47,32 @@ class HceTokenRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    /** @return HceToken[] */
+    public function findActiveByCardAndDevice(Card $card, string $deviceFingerprint): array
+    {
+        return $this->createQueryBuilder('t')
+            ->where('t.card = :card')
+            ->andWhere('t.deviceFingerprint = :fp')
+            ->andWhere('t.status = :status')
+            ->setParameter('card', $card)
+            ->setParameter('fp', $deviceFingerprint)
+            ->setParameter('status', 'ACTIVE')
+            ->getQuery()
+            ->getResult();
+    }
+
+    /** @return HceToken[] */
+    public function findActiveByCard(Card $card): array
+    {
+        return $this->createQueryBuilder('t')
+            ->where('t.card = :card')
+            ->andWhere('t.status = :status')
+            ->setParameter('card', $card)
+            ->setParameter('status', 'ACTIVE')
+            ->getQuery()
+            ->getResult();
+    }
+
     public function deactivateAllForCard(string $externalCardId): int
     {
         return $this->createQueryBuilder('t')

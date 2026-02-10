@@ -60,8 +60,8 @@ class UserTest extends TestCase
 
         $this->assertEquals('encrypted_email_blob', $user->getEncryptedEmail());
         $this->assertEquals('abc123def456', $user->getEmailIndex());
-        // UserIdentifier returns blind index (not email)
-        $this->assertEquals('abc123def456', $user->getUserIdentifier());
+        // UserIdentifier returns UUID (passkey auth, not email-based)
+        $this->assertEquals($user->getId()->toRfc4122(), $user->getUserIdentifier());
         $this->assertEquals('encrypted_first_name_blob', $user->getEncryptedFirstName());
         $this->assertEquals('encrypted_last_name_blob', $user->getEncryptedLastName());
         $this->assertEquals('encrypted_phone_blob', $user->getEncryptedPhoneNumber());

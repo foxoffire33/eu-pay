@@ -8,7 +8,15 @@ class CardEncryptionService
     private const CIPHER = 'aes-256-gcm';
     private const TAG_LEN = 16;
 
-    public function __construct(private readonly string $encryptionKey) {}
+    public function __construct(private readonly string $encryptionKey)
+    {
+        if (strlen($encryptionKey) !== 64) {
+            throw new \InvalidArgumentException('Encryption key must be exactly 64 hex chars (256 bits)');
+        }
+        if (!ctype_xdigit($encryptionKey)) {
+            throw new \InvalidArgumentException('Encryption key must contain only hex characters');
+        }
+    }
 
     public function encrypt(string $plaintext): string
     {

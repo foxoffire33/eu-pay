@@ -48,7 +48,7 @@ class CardService
         $card->setType('VIRTUAL');
         $card->setScheme($issuedCard['scheme'] ?? 'VISA');
         $card->setStatus($issuedCard['status'] ?? 'ACTIVE');
-        $card->setLast4($issuedCard['last4']);
+        $card->setLastFourDigits($issuedCard['last4']);
         $card->setExpiryDate(sprintf('%02d/%d', $issuedCard['expiryMonth'], $issuedCard['expiryYear']));
 
         $this->em->persist($card);
