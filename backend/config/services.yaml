@@ -6,6 +6,7 @@ parameters:
     blind_index_key: '%env(BLIND_INDEX_KEY)%'
     webauthn_rp_id: '%env(WEBAUTHN_RP_ID)%'
     webauthn_rp_name: '%env(WEBAUTHN_RP_NAME)%'
+    eupay_creditor_id: '%env(EUPAY_CREDITOR_ID)%'
 
 services:
     _defaults:
@@ -19,6 +20,13 @@ services:
             - '../src/Entity/'
             - '../src/Kernel.php'
 
+    # PSD2 Open Banking — dev stub for local testing (no API keys needed)
+    App\Service\OpenBankingInterface:
+        alias: App\Service\DevOpenBankingService
+
+    App\Service\DevOpenBankingService: ~
+
+    # Production: Rabobank PSD2 API (uncomment + set alias above to switch)
     App\Service\OpenBankingService:
         arguments:
             $rabobankClientId: '%env(PSD2_CLIENT_ID)%'
@@ -27,6 +35,10 @@ services:
             $rabobankKeyPath: '%env(PSD2_KEY_PATH)%'
             $rabobankApiBaseUrl: '%env(PSD2_API_BASE_URL)%'
             $appCallbackUrl: '%env(APP_CALLBACK_URL)%'
+
+    App\Service\DirectDebitService:
+        arguments:
+            $creditorId: '%eupay_creditor_id%'
 
     App\Service\CardEncryptionService:
         arguments:
@@ -78,7 +90,10 @@ services:
     # │ Bankable         │ Visa+MC   │ CSSF           │ 🇱🇺 Luxembourg             │
     # └──────────────────┴───────────┴────────────────┴──────────────────────────┘
     App\Service\CardIssuing\CardIssuerInterface:
-        alias: App\Service\CardIssuing\StripeCardIssuer
+        alias: App\Service\CardIssuing\DevCardIssuer
+
+    # Development stub — mock card issuer for local testing (no API keys needed)
+    App\Service\CardIssuing\DevCardIssuer: ~
 
     # 🇮🇪 Marqeta Europe Ltd — CBI Ireland, Visa
     App\Service\CardIssuing\MarqetaCardIssuer:

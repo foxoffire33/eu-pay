@@ -1,0 +1,65 @@
+# ── IDE ──
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+
+# ── OS ──
+.DS_Store
+Thumbs.db
+*.swp
+*~
+
+# ── Android ──
+android/.gradle/
+android/.kotlin/
+android/build/
+android/app/build/
+android/local.properties
+android/captures/
+android/.cxx/
+*.apk
+*.aab
+*.ap_
+*.dex
+
+# Gradle wrapper jar (downloadable)
+android/gradle/wrapper/gradle-wrapper.jar
+
+# ── Backend (PHP / Symfony) ──
+backend/vendor/
+backend/var/
+backend/bin/
+backend/composer.lock
+backend/.env.local
+backend/.env.*.local
+backend/config/jwt/*.pem
+backend/config/jwt/*.key
+backend/public/bundles/
+
+# ── Docker / Certs ──
+docker/certs/*.pem
+docker/certs/*.key
+docker/certs/*.crt
+
+# ── Environment / Secrets ──
+.env
+.env.local
+.env.*.local
+*.p12
+*.jks
+*.keystore
+
+# ── Logs ──
+*.log
+npm-debug.log*
+
+# ── Node (landing page) ──
+node_modules/
+landing-page/node_modules/
+
+# ── Misc ──
+*.bak
+*.tmp
+*.orig

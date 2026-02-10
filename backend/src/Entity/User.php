@@ -140,6 +140,14 @@ class User implements UserInterface
     #[ORM\OneToMany(targetEntity: WebAuthnCredential::class, mappedBy: 'user', cascade: ['persist', 'remove'])]
     private Collection $webAuthnCredentials;
 
+    /** @var Collection<int, LinkedBankAccount> */
+    #[ORM\OneToMany(targetEntity: LinkedBankAccount::class, mappedBy: 'user', cascade: ['persist'])]
+    private Collection $linkedBankAccounts;
+
+    /** @var Collection<int, DirectDebitMandate> */
+    #[ORM\OneToMany(targetEntity: DirectDebitMandate::class, mappedBy: 'user', cascade: ['persist'])]
+    private Collection $directDebitMandates;
+
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
     private \DateTimeImmutable $createdAt;
 
@@ -152,6 +160,8 @@ class User implements UserInterface
         $this->cards = new ArrayCollection();
         $this->hceTokens = new ArrayCollection();
         $this->webAuthnCredentials = new ArrayCollection();
+        $this->linkedBankAccounts = new ArrayCollection();
+        $this->directDebitMandates = new ArrayCollection();
         $this->createdAt = new \DateTimeImmutable();
         $this->updatedAt = new \DateTimeImmutable();
     }
@@ -287,6 +297,13 @@ class User implements UserInterface
         $this->anonymizedAt = new \DateTimeImmutable();
         $this->marketingConsent = false;
         $this->deviceTrackingConsent = false;
+
+        foreach ($this->linkedBankAccounts as $account) {
+            $account->revoke();
+        }
+        foreach ($this->directDebitMandates as $mandate) {
+            $mandate->revoke();
+        }
     }
 
     // ── Relations ──
@@ -299,6 +316,12 @@ class User implements UserInterface
 
     /** @return Collection<int, WebAuthnCredential> */
     public function getWebAuthnCredentials(): Collection { return $this->webAuthnCredentials; }
+
+    /** @return Collection<int, LinkedBankAccount> */
+    public function getLinkedBankAccounts(): Collection { return $this->linkedBankAccounts; }
+
+    /** @return Collection<int, DirectDebitMandate> */
+    public function getDirectDebitMandates(): Collection { return $this->directDebitMandates; }
 
     public function getCreatedAt(): \DateTimeImmutable { return $this->createdAt; }
     public function getUpdatedAt(): \DateTimeImmutable { return $this->updatedAt; }

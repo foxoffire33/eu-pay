@@ -1,5 +1,6 @@
 package nl.delaparra_services.apps.eupay.ui.screen
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -23,6 +24,7 @@ import nl.delaparra_services.apps.eupay.ui.viewmodel.SettingsViewModel
 @Composable
 fun SettingsScreen(
     onLogout: () -> Unit,
+    onNavigateToAccounts: () -> Unit = {},
     viewModel: SettingsViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsState()
@@ -94,6 +96,7 @@ fun SettingsScreen(
                         supportingContent = {
                             Text(if (profile.hasBankAccount == true) "Linked" else "Not linked")
                         },
+                        modifier = Modifier.clickable(onClick = onNavigateToAccounts),
                     )
                 }
 

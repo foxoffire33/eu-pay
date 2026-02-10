@@ -19,7 +19,7 @@ use Psr\Log\LoggerInterface;
  * @see https://developer.rabobank.nl/ — Rabobank PSD2 sandbox + production
  * @see https://www.berlin-group.org/ — NextGenPSD2 specification
  */
-class OpenBankingService
+class OpenBankingService implements OpenBankingInterface
 {
     private const RABOBANK_SANDBOX_URL = 'https://api-sandbox.rabobank.nl';
     private const RABOBANK_PRODUCTION_URL = 'https://api.rabobank.nl';

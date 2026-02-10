@@ -12,6 +12,7 @@ import nl.delaparra_services.apps.eupay.api.EuPayApi
 import nl.delaparra_services.apps.eupay.repository.TokenRepository
 import nl.delaparra_services.apps.eupay.crypto.ClientKeyManager
 import nl.delaparra_services.apps.eupay.service.AuthService
+import nl.delaparra_services.apps.eupay.service.AccountService
 import nl.delaparra_services.apps.eupay.service.CardService
 import nl.delaparra_services.apps.eupay.service.PasskeyService
 import nl.delaparra_services.apps.eupay.service.PaymentService
@@ -109,4 +110,8 @@ object AppModule {
     @Provides
     @Singleton
     fun providePaymentService(api: EuPayApi) = PaymentService(api)
+
+    @Provides
+    @Singleton
+    fun provideAccountService(api: EuPayApi) = AccountService(api)
 }

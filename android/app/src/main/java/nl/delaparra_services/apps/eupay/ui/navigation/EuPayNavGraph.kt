@@ -42,7 +42,8 @@ fun EuPayNavGraph(isLoggedIn: Boolean) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
     val showBottomBar = currentRoute in bottomNavItems.map { it.screen.route } ||
-            currentRoute == Screen.TopUp.route
+            currentRoute == Screen.TopUp.route ||
+            currentRoute == Screen.Accounts.route
 
     Scaffold(
         bottomBar = {
@@ -80,8 +81,24 @@ fun EuPayNavGraph(isLoggedIn: Boolean) {
             composable(Screen.Login.route) {
                 LoginScreen(
                     onLoginSuccess = {
-                        navController.navigate(Screen.Home.route) {
+                        navController.navigate(Screen.SetupWizard.route) {
                             popUpTo(Screen.Login.route) { inclusive = true }
+                        }
+                    },
+                )
+            }
+
+            // Setup wizard (skippable)
+            composable(Screen.SetupWizard.route) {
+                SetupWizardScreen(
+                    onComplete = {
+                        navController.navigate(Screen.Home.route) {
+                            popUpTo(Screen.SetupWizard.route) { inclusive = true }
+                        }
+                    },
+                    onSkip = {
+                        navController.navigate(Screen.Home.route) {
+                            popUpTo(Screen.SetupWizard.route) { inclusive = true }
                         }
                     },
                 )
@@ -109,6 +126,7 @@ fun EuPayNavGraph(isLoggedIn: Boolean) {
                             restoreState = true
                         }
                     },
+                    onNavigateToAccounts = { navController.navigate(Screen.Accounts.route) },
                 )
             }
             composable(Screen.Cards.route) { CardsScreen() }
@@ -121,10 +139,14 @@ fun EuPayNavGraph(isLoggedIn: Boolean) {
                             popUpTo(0) { inclusive = true }
                         }
                     },
+                    onNavigateToAccounts = { navController.navigate(Screen.Accounts.route) },
                 )
             }
             composable(Screen.TopUp.route) {
                 TopUpScreen(onNavigateBack = { navController.popBackStack() })
+            }
+            composable(Screen.Accounts.route) {
+                AccountsScreen(onNavigateBack = { navController.popBackStack() })
             }
         }
     }

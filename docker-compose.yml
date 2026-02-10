@@ -59,6 +59,7 @@ services:
       CARD_ISSUER_FUNDING_TOKEN: "${CARD_ISSUER_FUNDING_TOKEN:-sandbox-funding}"
       EUPAY_CREDITOR_IBAN: "${EUPAY_CREDITOR_IBAN:-DE00000000000000000000}"
       EUPAY_CREDITOR_NAME: "${EUPAY_CREDITOR_NAME:-EU Pay GmbH}"
+      EUPAY_CREDITOR_ID: "${EUPAY_CREDITOR_ID:-NL00ZZZ000000000000}"
     depends_on:
       postgres:
         condition: service_healthy

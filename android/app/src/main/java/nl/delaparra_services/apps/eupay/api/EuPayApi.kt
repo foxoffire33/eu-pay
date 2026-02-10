@@ -27,16 +27,53 @@ interface EuPayApi {
     @POST("api/me/rotate-key")
     suspend fun rotateKey(@Body request: KeyRotateRequest): Response<Map<String, String>>
 
-    // ── Account ─────────────────────────────────
+    // ── Linked Bank Accounts (PSD2 AISP) ────────
 
-    @POST("api/account/create")
-    suspend fun createAccount(@Body request: Map<String, String>): Response<AccountResponse>
+    @POST("api/account/link")
+    suspend fun linkBankAccount(@Body request: LinkAccountRequest): Response<LinkAccountResult>
 
-    @GET("api/account/balance")
-    suspend fun getBalance(): Response<BalanceResponse>
+    @POST("api/account/link/callback")
+    suspend fun confirmLinkConsent(@Body request: ConsentCallbackRequest): Response<LinkedAccountResponse>
 
-    @GET("api/account/transactions")
-    suspend fun getTransactions(): Response<TransactionsWrapper>
+    @GET("api/account/linked")
+    suspend fun getLinkedAccounts(): Response<LinkedAccountsListResponse>
+
+    @GET("api/account/{id}/balance")
+    suspend fun getLinkedAccountBalance(@Path("id") accountId: String): Response<AccountBalanceResponse>
+
+    @GET("api/account/{id}/transactions")
+    suspend fun getLinkedAccountTransactions(
+        @Path("id") accountId: String,
+        @Query("from") dateFrom: String? = null,
+    ): Response<AccountTransactionsResponse>
+
+    @DELETE("api/account/{id}")
+    suspend fun unlinkBankAccount(@Path("id") accountId: String): Response<Map<String, String>>
+
+    @POST("api/account/{id}/refresh")
+    suspend fun refreshAccountConsent(@Path("id") accountId: String): Response<LinkAccountResult>
+
+    @GET("api/account/banks")
+    suspend fun getAccountBanks(@Query("country") countryCode: String? = null): Response<BankListResponse>
+
+    // ── SEPA Direct Debit Mandate ────────────────
+
+    @POST("api/account/mandate")
+    suspend fun createMandate(@Body request: CreateMandateRequest): Response<MandateResponse>
+
+    @POST("api/account/mandate/activate")
+    suspend fun activateMandate(): Response<MandateResponse>
+
+    @DELETE("api/account/mandate")
+    suspend fun revokeMandate(): Response<Map<String, String>>
+
+    @GET("api/account/mandate")
+    suspend fun getMandate(): Response<MandateWrapper>
+
+    // ── Onboarding ───────────────────────────────
+
+    @GET("api/account/onboarding-status")
+    suspend fun getOnboardingStatus(): Response<OnboardingStatusResponse>
 
     // ── Cards ───────────────────────────────────
 

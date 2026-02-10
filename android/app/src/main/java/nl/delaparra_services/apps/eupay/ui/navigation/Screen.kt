@@ -14,4 +14,6 @@ sealed class Screen(val route: String) {
 
     // Nested
     data object TopUp : Screen("topup")
+    data object Accounts : Screen("accounts")
+    data object SetupWizard : Screen("setup")
 }

@@ -33,7 +33,7 @@ class P2PTransferService
     private const DAILY_LIMIT_CENTS = 5_000_000;
 
     public function __construct(
-        private readonly OpenBankingService $banking,
+        private readonly OpenBankingInterface $banking,
         private readonly EnvelopeEncryptionService $encryption,
         private readonly BlindIndexService $blindIndex,
         private readonly UserRepository $userRepository,

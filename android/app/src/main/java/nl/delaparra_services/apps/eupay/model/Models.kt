@@ -69,17 +69,87 @@ data class KeyRotateRequest(
     @SerializedName("re_encrypted_phone") val reEncryptedPhone: String?,
 )
 
-// ── Account ─────────────────────────────────────
+// ── Linked Bank Accounts (PSD2 AISP) ──────────
 
-data class AccountResponse(
-    val consentId: String?,
-    val authorisationUrl: String?,
-    val validUntil: String?,
+data class LinkedAccountResponse(
+    val id: String,
+    @SerializedName("bank_name") val bankName: String?,
+    @SerializedName("bank_bic") val bankBic: String?,
+    @SerializedName("iban_last_four") val ibanLastFour: String,
+    @SerializedName("iban_country") val ibanCountry: String,
+    val status: String,
+    @SerializedName("consent_valid_until") val consentValidUntil: String?,
+    @SerializedName("needs_refresh") val needsRefresh: Boolean = false,
+    val label: String?,
+    @SerializedName("created_at") val createdAt: String?,
+) {
+    val isActive: Boolean get() = status == "active"
+    val displayName: String get() = label ?: "${bankName ?: "Bank"} ••${ibanLastFour}"
+    val maskedIban: String get() = "${ibanCountry}••••••••${ibanLastFour}"
+}
+
+data class LinkedAccountsListResponse(
+    val accounts: List<LinkedAccountResponse>,
 )
 
-data class BalanceResponse(
+data class LinkAccountRequest(
+    val iban: String,
+    val bic: String? = null,
+    val label: String? = null,
+)
+
+data class LinkAccountResult(
+    val accountId: String,
+    val authorisationUrl: String,
+    val validUntil: String,
+)
+
+data class ConsentCallbackRequest(
+    @SerializedName("consent_id") val consentId: String,
+    val success: Boolean,
+)
+
+data class AccountBalanceResponse(
     val balances: List<Map<String, Any>>?,
     @SerializedName("account_id") val accountId: String?,
+    @SerializedName("bank_name") val bankName: String?,
+)
+
+data class AccountTransactionsResponse(
+    val transactions: List<Map<String, Any>>?,
+    @SerializedName("account_id") val accountId: String?,
+)
+
+// ── SEPA Direct Debit Mandate (Euro-incasso) ──
+
+data class MandateResponse(
+    val id: String,
+    @SerializedName("mandate_reference") val mandateReference: String?,
+    val status: String,
+    @SerializedName("max_amount_cents") val maxAmountCents: Int,
+    @SerializedName("signed_at") val signedAt: String?,
+    @SerializedName("bank_name") val bankName: String?,
+    @SerializedName("iban_last_four") val ibanLastFour: String?,
+) {
+    val isActive: Boolean get() = status == "active"
+}
+
+data class MandateWrapper(
+    val mandate: MandateResponse?,
+)
+
+data class CreateMandateRequest(
+    @SerializedName("account_id") val accountId: String,
+    @SerializedName("max_amount_cents") val maxAmountCents: Int = 50000,
+)
+
+// ── Onboarding ─────────────────────────────────
+
+data class OnboardingStatusResponse(
+    @SerializedName("bank_linked") val bankLinked: Boolean,
+    @SerializedName("card_issued") val cardIssued: Boolean,
+    @SerializedName("mandate_active") val mandateActive: Boolean,
+    val ready: Boolean,
 )
 
 // ── Cards ───────────────────────────────────────

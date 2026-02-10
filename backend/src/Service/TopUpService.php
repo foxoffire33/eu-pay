@@ -27,7 +27,7 @@ class TopUpService
     private const DAILY_LIMIT_CENTS = 5_000_000;  // €50,000.00 daily
 
     public function __construct(
-        private readonly OpenBankingService $openBanking,
+        private readonly OpenBankingInterface $openBanking,
         private readonly EnvelopeEncryptionService $encryption,
         private readonly TopUpRepository $topUpRepository,
         private readonly EntityManagerInterface $em,

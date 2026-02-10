@@ -1,12 +1,14 @@
 package nl.delaparra_services.apps.eupay.ui.screen
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBalance
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.NearMe
 import androidx.compose.material.icons.filled.Contactless
+import androidx.compose.material.icons.filled.RadioButtonUnchecked
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -16,7 +18,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import nl.delaparra_services.apps.eupay.model.TransactionResponse
 import nl.delaparra_services.apps.eupay.ui.viewmodel.HomeViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -25,6 +26,7 @@ fun HomeScreen(
     onNavigateToTopUp: () -> Unit,
     onNavigateToPay: () -> Unit,
     onNavigateToSend: () -> Unit,
+    onNavigateToAccounts: () -> Unit,
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsState()
@@ -40,7 +42,7 @@ fun HomeScreen(
             )
         },
     ) { padding ->
-        if (state.isLoading && state.balance == null) {
+        if (state.isLoading && state.balanceAmount == null && state.onboarding == null) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -57,17 +59,91 @@ fun HomeScreen(
                 contentPadding = PaddingValues(16.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
+                // Onboarding banner
+                val onboarding = state.onboarding
+                if (onboarding != null && !onboarding.ready) {
+                    item {
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable(onClick = onNavigateToAccounts),
+                            colors = CardDefaults.cardColors(
+                                containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                            ),
+                        ) {
+                            Column(modifier = Modifier.padding(16.dp)) {
+                                Text(
+                                    text = "Complete setup to start paying",
+                                    style = MaterialTheme.typography.titleSmall,
+                                    fontWeight = FontWeight.SemiBold,
+                                    color = MaterialTheme.colorScheme.onSecondaryContainer,
+                                )
+                                Spacer(modifier = Modifier.height(8.dp))
+                                SetupStep("Link bank account", onboarding.bankLinked)
+                                SetupStep("Create debit card", onboarding.cardIssued)
+                                SetupStep("Enable Euro-incasso", onboarding.mandateActive)
+                                Spacer(modifier = Modifier.height(8.dp))
+                                Text(
+                                    text = "Tap to complete setup",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.7f),
+                                )
+                            }
+                        }
+                    }
+                }
+
                 // Balance card
                 item {
-                    val balanceEntry = state.balance?.balances?.firstOrNull()
-                    val amount = (balanceEntry?.get("balanceAmount") as? Map<*, *>)
-                        ?.get("amount") as? String
-                    val currency = (balanceEntry?.get("balanceAmount") as? Map<*, *>)
-                        ?.get("currency") as? String
                     BalanceCard(
-                        balance = amount?.toDoubleOrNull(),
-                        currency = currency ?: "EUR",
+                        balance = state.balanceAmount?.toDoubleOrNull(),
+                        currency = state.balanceCurrency,
                     )
+                }
+
+                // Linked accounts summary
+                if (state.linkedAccounts.isNotEmpty()) {
+                    item {
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable(onClick = onNavigateToAccounts),
+                        ) {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Icon(
+                                        Icons.Default.AccountBalance,
+                                        contentDescription = null,
+                                        tint = MaterialTheme.colorScheme.primary,
+                                    )
+                                    Spacer(modifier = Modifier.width(12.dp))
+                                    Column {
+                                        Text(
+                                            text = "Linked Accounts",
+                                            style = MaterialTheme.typography.bodyLarge,
+                                            fontWeight = FontWeight.Medium,
+                                        )
+                                        Text(
+                                            text = "${state.linkedAccounts.size} account${if (state.linkedAccounts.size != 1) "s" else ""}",
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        )
+                                    }
+                                }
+                                Icon(
+                                    Icons.Default.AccountBalance,
+                                    contentDescription = "View accounts",
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                )
+                            }
+                        }
+                    }
                 }
 
                 // Quick actions
@@ -95,31 +171,31 @@ fun HomeScreen(
                         }
                     }
                 }
-
-                // Recent transactions
-                item {
-                    Text(
-                        text = "Recent Transactions",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.SemiBold,
-                    )
-                }
-
-                if (state.transactions.isEmpty()) {
-                    item {
-                        Text(
-                            text = "No transactions yet",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
-                    }
-                } else {
-                    items(state.transactions.take(10)) { tx ->
-                        TransactionItem(tx)
-                    }
-                }
             }
         }
+    }
+}
+
+@Composable
+private fun SetupStep(label: String, completed: Boolean) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.padding(vertical = 2.dp),
+    ) {
+        Icon(
+            if (completed) Icons.Default.CheckCircle else Icons.Default.RadioButtonUnchecked,
+            contentDescription = null,
+            modifier = Modifier.size(18.dp),
+            tint = if (completed) MaterialTheme.colorScheme.primary
+            else MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        Spacer(modifier = Modifier.width(8.dp))
+        Text(
+            text = label,
+            style = MaterialTheme.typography.bodySmall,
+            color = if (completed) MaterialTheme.colorScheme.onSecondaryContainer
+            else MaterialTheme.colorScheme.onSurfaceVariant,
+        )
     }
 }
 
@@ -135,7 +211,7 @@ private fun BalanceCard(balance: Double?, currency: String) {
             modifier = Modifier.padding(24.dp),
         ) {
             Text(
-                text = "Available Balance",
+                text = "Bank Balance",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f),
             )
@@ -212,46 +288,6 @@ private fun QuickActionButton(
                 text = label,
                 style = MaterialTheme.typography.labelMedium,
             )
-        }
-    }
-}
-
-@Composable
-private fun TransactionItem(tx: TransactionResponse) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = tx.type.replaceFirstChar { it.uppercase() },
-                    style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = FontWeight.Medium,
-                )
-                Text(
-                    text = tx.createdAt.take(10),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            }
-            Column(horizontalAlignment = Alignment.End) {
-                Text(
-                    text = "\u20AC${tx.amount}",
-                    style = MaterialTheme.typography.bodyLarge,
-                    fontWeight = FontWeight.SemiBold,
-                )
-                Text(
-                    text = tx.status,
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            }
         }
     }
 }
