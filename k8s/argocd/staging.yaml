@@ -18,7 +18,7 @@ spec:
 
   destination:
     server: https://kubernetes.default.svc
-    namespace: eupay
+    namespace: eupay-staging
 
   syncPolicy:
     automated:

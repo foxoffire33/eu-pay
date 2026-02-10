@@ -8,9 +8,11 @@ metadata:
 spec:
   description: EU Pay — NFC payment platform
 
-  # Only allow deployments to the eupay namespace
+  # Allow deployments to eupay (production) and eupay-staging namespaces
   destinations:
     - namespace: eupay
+      server: https://kubernetes.default.svc
+    - namespace: eupay-staging
       server: https://kubernetes.default.svc
 
   # Only allow resources from the eu-pay repo
