@@ -26,7 +26,9 @@ RUN chown -R nginx:nginx /usr/share/nginx/html \
     && touch /var/run/nginx.pid \
     && chown nginx:nginx /var/run/nginx.pid
 
-EXPOSE 80
+EXPOSE 8080
+
+USER nginx
 
 HEALTHCHECK --interval=30s --timeout=3s \
-  CMD wget -qO- http://localhost/health || exit 1
+  CMD wget -qO- http://localhost:8080/health || exit 1

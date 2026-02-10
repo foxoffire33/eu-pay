@@ -29,7 +29,7 @@ spec:
         - name: landing
           image: ghcr.io/foxoffire33/eu-pay/landing-page:latest
           ports:
-            - containerPort: 80
+            - containerPort: 8080
               protocol: TCP
           resources:
             requests:
@@ -41,13 +41,13 @@ spec:
           livenessProbe:
             httpGet:
               path: /health
-              port: 80
+              port: 8080
             initialDelaySeconds: 5
             periodSeconds: 10
           readinessProbe:
             httpGet:
               path: /health
-              port: 80
+              port: 8080
             initialDelaySeconds: 3
             periodSeconds: 5
           securityContext:
