@@ -5,6 +5,7 @@ namespace: eupay-staging
 
 resources:
   - ../../base
+  - redirect-ingress.yaml
 
 patches:
   # ── Scale down for staging ──

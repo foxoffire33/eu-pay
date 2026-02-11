@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: eupay-redirect
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/permanent-redirect: "https://staging.eu-pay.nl$request_uri"
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - eu-pay.nl
+      secretName: eupay-redirect-tls
+  rules:
+    - host: eu-pay.nl
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: eupay-landing
+                port:
+                  number: 80
