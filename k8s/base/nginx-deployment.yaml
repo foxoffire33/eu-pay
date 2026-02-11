@@ -21,13 +21,15 @@ spec:
         app: eupay-nginx
     spec:
       securityContext:
-        runAsNonRoot: false  # nginx needs root to bind port 80
+        runAsNonRoot: true
+        runAsUser: 101
+        runAsGroup: 101
 
       containers:
         - name: nginx
           image: ghcr.io/foxoffire33/eu-pay/nginx:latest
           ports:
-            - containerPort: 80
+            - containerPort: 8080
               protocol: TCP
           volumeMounts:
             - name: nginx-config
@@ -36,6 +38,10 @@ spec:
             - name: public-assets
               mountPath: /app/public
               readOnly: true
+            - name: nginx-cache
+              mountPath: /var/cache/nginx
+            - name: nginx-run
+              mountPath: /var/run
           resources:
             requests:
               cpu: 50m
@@ -46,26 +52,30 @@ spec:
           livenessProbe:
             httpGet:
               path: /health
-              port: 80
+              port: 8080
             initialDelaySeconds: 5
             periodSeconds: 10
           readinessProbe:
             httpGet:
               path: /health
-              port: 80
+              port: 8080
             initialDelaySeconds: 3
             periodSeconds: 5
           securityContext:
             allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
             capabilities:
               drop: ["ALL"]
-              add: ["NET_BIND_SERVICE"]
 
       volumes:
         - name: nginx-config
           configMap:
             name: eupay-nginx-config
         - name: public-assets
+          emptyDir: {}
+        - name: nginx-cache
+          emptyDir: {}
+        - name: nginx-run
           emptyDir: {}
 
       topologySpreadConstraints:
@@ -88,7 +98,7 @@ data:
     }
 
     server {
-        listen 80;
+        listen 8080;
         server_name _;
 
         root /app/public;
