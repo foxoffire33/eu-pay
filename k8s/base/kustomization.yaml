@@ -48,11 +48,11 @@ generatorOptions:
 
 images:
   - name: ghcr.io/foxoffire33/eu-pay/php
-    newTag: sha-4dbcbe4
+    newTag: sha-7b65d6f
   - name: ghcr.io/foxoffire33/eu-pay/nginx
-    newTag: sha-4dbcbe4
+    newTag: sha-7b65d6f
   - name: ghcr.io/foxoffire33/eu-pay/landing-page
-    newTag: sha-4dbcbe4
+    newTag: sha-7b65d6f
 
 labels:
   - pairs:
